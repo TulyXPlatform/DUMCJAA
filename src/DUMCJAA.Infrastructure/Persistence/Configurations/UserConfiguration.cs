@@ -25,9 +25,8 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired()
             .HasMaxLength(100);
             
-        builder.Property(x => x.Role)
-            .IsRequired()
-            .HasMaxLength(50);
+        builder.Property(x => x.IsEmailVerified)
+            .HasDefaultValue(false);
 
         builder.HasIndex(x => x.Email).IsUnique();
     }

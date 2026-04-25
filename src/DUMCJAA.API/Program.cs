@@ -91,6 +91,9 @@ try
         };
     });
     
+    // RBAC dynamic policy registration
+    builder.Services.AddSingleton<Microsoft.AspNetCore.Authorization.IAuthorizationPolicyProvider, DUMCJAA.Infrastructure.Auth.PermissionPolicyProvider>();
+    builder.Services.AddScoped<Microsoft.AspNetCore.Authorization.IAuthorizationHandler, DUMCJAA.Infrastructure.Auth.PermissionAuthorizationHandler>();
     builder.Services.AddAuthorization();
 
     // ── CORS ──
@@ -107,6 +110,15 @@ try
     });
 
     var app = builder.Build();
+
+    // ── Seeding ──
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        var context = services.GetRequiredService<DUMCJAA.Infrastructure.Persistence.ApplicationDbContext>();
+        var passwordHasher = services.GetRequiredService<DUMCJAA.Domain.Interfaces.IPasswordHasher>();
+        await DUMCJAA.Infrastructure.Persistence.DbInitializer.SeedAsync(context, passwordHasher);
+    }
 
     // ── Middleware pipeline ──
     app.UseMiddleware<GlobalExceptionMiddleware>();

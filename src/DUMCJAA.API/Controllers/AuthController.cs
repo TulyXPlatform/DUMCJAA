@@ -49,8 +49,23 @@ public class AuthController : ControllerBase
                 validationResult.Errors.Select(e => e.ErrorMessage).ToList());
 
         var result = await _authService.RegisterAsync(dto, ct);
-        return CreatedAtAction(nameof(GetCurrentUser), new { }, 
-            ApiResponse<AuthResponseDto>.SuccessResponse(result, "Registered successfully.", 201));
+        return Ok(ApiResponse<AuthResponseDto>.SuccessResponse(result, "Registered successfully. Please verify your email."));
+    }
+
+    [HttpPost("verify-email")]
+    [AllowAnonymous]
+    public async Task<IActionResult> VerifyEmail([FromBody] VerifyOTPDto dto, CancellationToken ct)
+    {
+        await _authService.VerifyEmailAsync(dto, ct);
+        return Ok(ApiResponse<object>.SuccessResponse(null, "Email verified successfully. You can now login."));
+    }
+
+    [HttpPost("request-email-verification-otp")]
+    [AllowAnonymous]
+    public async Task<IActionResult> RequestEmailVerificationOTP([FromBody] RequestOTPDto dto, CancellationToken ct)
+    {
+        await _authService.RequestEmailVerificationOTPAsync(dto, ct);
+        return Ok(ApiResponse<object>.SuccessResponse(null, "A new verification code has been sent."));
     }
 
     [HttpGet("me")]
@@ -63,5 +78,31 @@ public class AuthController : ControllerBase
 
         var result = await _authService.GetCurrentUserAsync(userId, ct);
         return Ok(ApiResponse<UserDto>.SuccessResponse(result));
+    }
+
+    [HttpPost("request-password-change-otp")]
+    [AllowAnonymous]
+    public async Task<IActionResult> RequestOTP([FromBody] RequestOTPDto dto, CancellationToken ct)
+    {
+        await _authService.RequestPasswordChangeOTPAsync(dto, ct);
+        return Ok(ApiResponse<object>.SuccessResponse(null, "If an account exists, a verification code has been sent."));
+    }
+
+    [HttpPost("verify-otp")]
+    [AllowAnonymous]
+    public async Task<IActionResult> VerifyOTP([FromBody] VerifyOTPDto dto, CancellationToken ct)
+    {
+        var isValid = await _authService.VerifyOTPAsync(dto, ct);
+        if (!isValid) return BadRequest(ApiResponse<object>.ErrorResponse("Invalid or expired code.", 400));
+        
+        return Ok(ApiResponse<object>.SuccessResponse(null, "Code verified successfully."));
+    }
+
+    [HttpPost("change-password")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto, CancellationToken ct)
+    {
+        await _authService.ChangePasswordAsync(dto, ct);
+        return Ok(ApiResponse<object>.SuccessResponse(null, "Password changed successfully."));
     }
 }

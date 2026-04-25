@@ -7,5 +7,5 @@ namespace DUMCJAA.Domain.Interfaces;
 /// </summary>
 public interface ITokenService
 {
-    (string Token, DateTime ExpiresAt) GenerateToken(User user);
+    (string Token, DateTime ExpiresAt) GenerateToken(User user, IEnumerable<string> permissions);
 }

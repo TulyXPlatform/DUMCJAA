@@ -10,6 +10,11 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<SampleEntity> Samples => Set<SampleEntity>();
     public DbSet<User> Users => Set<User>();
+    public DbSet<Role> Roles => Set<Role>();
+    public DbSet<Permission> Permissions => Set<Permission>();
+    public DbSet<UserRole> UserRoles => Set<UserRole>();
+    public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
+    public DbSet<OTPVerification> OTPVerifications => Set<OTPVerification>();
     public DbSet<Alumnus> Alumni => Set<Alumnus>();
     public DbSet<Event> Events => Set<Event>();
     public DbSet<EventRegistration> EventRegistrations => Set<EventRegistration>();

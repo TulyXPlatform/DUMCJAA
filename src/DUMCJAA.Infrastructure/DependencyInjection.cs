@@ -17,9 +17,19 @@ public static class DependencyInjection
                 b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
 
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+        services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddSingleton<IPasswordHasher, DUMCJAA.Infrastructure.Auth.PasswordHasher>();
-        services.AddSingleton<ITokenService, DUMCJAA.Infrastructure.Auth.TokenService>();
+        
+        services.AddScoped<IPasswordHasher, DUMCJAA.Infrastructure.Auth.PasswordHasher>();
+        services.AddScoped<ITokenService, DUMCJAA.Infrastructure.Auth.TokenService>();
+        
+        // Email System (Pluggable)
+        services.Configure<DUMCJAA.Infrastructure.Email.EmailSettings>(configuration.GetSection("Email"));
+        services.AddScoped<DUMCJAA.Infrastructure.Email.IEmailProvider, DUMCJAA.Infrastructure.Email.GmailSmtpProvider>();
+        services.AddScoped<IEmailService, DUMCJAA.Infrastructure.Email.EmailService>();
+        
+        services.AddScoped<IOTPService, DUMCJAA.Infrastructure.Services.OTPService>();
+
         services.AddSingleton<DUMCJAA.Application.Features.Files.IFileService, DUMCJAA.Infrastructure.Services.LocalFileService>();
 
         return services;

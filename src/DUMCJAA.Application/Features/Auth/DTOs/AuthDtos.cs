@@ -17,7 +17,8 @@ public record AuthResponseDto(
     Guid UserId,
     string Email,
     string FullName,
-    string Role,
+    IEnumerable<string> Roles,
+    IEnumerable<string> Permissions,
     string Token,
     DateTime ExpiresAt
 );
@@ -28,8 +29,18 @@ public record UserDto(
     string FirstName,
     string LastName,
     string FullName,
-    string Role,
+    IEnumerable<string> Roles,
     bool IsActive,
     DateTime CreatedAt,
     DateTime? LastLoginAt
+);
+
+public record RequestOTPDto(string Email);
+
+public record VerifyOTPDto(string Email, string Code);
+
+public record ChangePasswordDto(
+    string Email,
+    string Code, // The OTP verified previously
+    string NewPassword
 );
