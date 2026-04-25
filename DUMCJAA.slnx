@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/DUMCJAA.API/DUMCJAA.API.csproj" />
+    <Project Path="src/DUMCJAA.Application/DUMCJAA.Application.csproj" />
+    <Project Path="src/DUMCJAA.Domain/DUMCJAA.Domain.csproj" />
+    <Project Path="src/DUMCJAA.Infrastructure/DUMCJAA.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/DUMCJAA.Tests/DUMCJAA.Tests.csproj" />
+  </Folder>
+</Solution>
