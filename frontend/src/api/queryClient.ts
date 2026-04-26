@@ -8,21 +8,21 @@ export const queryClient = new QueryClient({
       
       // Smart Retry Logic
       retry: (failureCount, error) => {
-        // Stop retrying after 2 attempts
-        if (failureCount >= 2) return false;
+        // Stop retrying after 1 retry attempt
+        if (failureCount >= 1) return false;
         
         // If the error is an Axios error, check the status code
         if (error instanceof AxiosError && error.response) {
           const status = error.response.status;
           
-          // DO NOT retry client errors (400 Bad Request, 401 Auth, 403 Forbidden, 404 Not Found)
-          // because retrying them will just result in the exact same error immediately.
-          if (status >= 400 && status < 500) {
+          // DO NOT retry any HTTP response errors (4xx or 5xx).
+          // Automatic retries on server-side failures create noisy logs and poor UX.
+          if (status >= 400) {
             return false;
           }
         }
         
-        // DO retry Network errors (no response) or 5xx Server Errors
+        // Retry only true network errors (no response), once.
         return true;
       },
       

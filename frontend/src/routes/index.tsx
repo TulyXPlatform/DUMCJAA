@@ -1,6 +1,5 @@
 import { lazy } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { ScrollToTop } from '../hooks/useScrollToTop';
 import { MainLayout } from '../layouts/MainLayout';
 import { AdminLayout } from '../layouts/AdminLayout';
 import { ProtectedRoute } from '../components/ProtectedRoute';
@@ -25,6 +24,7 @@ const UserRolesManagement = lazy(() => import('../features/admin/components/rbac
 const Login = lazy(() => import('../features/auth/components/Login').then((m) => ({ default: m.Login })));
 const Register = lazy(() => import('../features/auth/components/Register').then((m) => ({ default: m.Register })));
 const ForgotPassword = lazy(() => import('../features/auth/components/ForgotPassword').then((m) => ({ default: m.ForgotPassword })));
+const EmailVerification = lazy(() => import('../features/auth/components/EmailVerification').then((m) => ({ default: m.EmailVerification })));
 
 const NotFound = () => (
   <div style={{ textAlign: 'center', padding: '5rem 2rem' }}>
@@ -48,7 +48,8 @@ const router = createBrowserRouter([
       { path: 'gallery', element: <GalleryPage /> },
       { path: 'login', element: <Login /> },
       { path: 'register', element: <Register /> },
-      { path: 'forgot-password', element: <ForgotPassword /> }
+      { path: 'forgot-password', element: <ForgotPassword /> },
+      { path: 'verify-email', element: <EmailVerification /> }
     ],
   },
   {
@@ -74,9 +75,6 @@ const router = createBrowserRouter([
 
 export const AppRouter = () => {
   return (
-    <>
-      <ScrollToTop />
-      <RouterProvider router={router} />
-    </>
+    <RouterProvider router={router} />
   );
 };
