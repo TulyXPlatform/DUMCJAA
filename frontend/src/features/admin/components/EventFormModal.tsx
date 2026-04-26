@@ -13,10 +13,7 @@ const schema = z.object({
   description:    z.string().min(10, 'Description must be at least 10 characters'),
   eventDate:      z.string().min(1, 'Event date is required'),
   location:       z.string().min(2, 'Location is required'),
-  maxAttendees:   z.preprocess(
-                    (val) => (val === '' ? undefined : val),
-                    z.coerce.number().int().positive().optional()
-                  ),
+  maxAttendees:   z.string().optional(),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -45,16 +42,19 @@ export const EventFormModal: React.FC<Props> = ({ isOpen, event, onClose, onSucc
         description:  event.description,
         eventDate:    event.eventDate.slice(0, 16),   // datetime-local format
         location:     event.location,
-        maxAttendees: event.maxAttendees ?? undefined,
+        maxAttendees: event.maxAttendees ? String(event.maxAttendees) : '',
       });
     } else {
-      reset({ title: '', description: '', eventDate: '', location: '', maxAttendees: undefined });
+      reset({ title: '', description: '', eventDate: '', location: '', maxAttendees: '' });
     }
   }, [event, reset]);
 
   const mutation = useMutation({
     mutationFn: async (values: FormValues) => {
-      const payload = { ...values, maxAttendees: values.maxAttendees || undefined };
+      const payload = { 
+        ...values, 
+        maxAttendees: values.maxAttendees ? parseInt(values.maxAttendees, 10) : undefined 
+      };
       if (isEdit) {
         return apiClient.put(`/events/${event!.id}`, payload);
       }
@@ -78,7 +78,7 @@ export const EventFormModal: React.FC<Props> = ({ isOpen, event, onClose, onSucc
           <button className="modal-close-btn" onClick={onClose} aria-label="Close"><X size={20} /></button>
         </div>
 
-        <form className="modal-form" onSubmit={handleSubmit(v => mutation.mutate(v as FormValues))}>
+        <form className="modal-form" onSubmit={handleSubmit(v => mutation.mutate(v as any))}>
           <div className="form-grid">
             <div className="form-field form-field--full">
               <label className="form-label" htmlFor="evt-title">Event Title *</label>
