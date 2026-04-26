@@ -92,7 +92,7 @@ export const AlumniList: React.FC = () => {
         <>
           <div className="alumni-grid">
             {pagedData.items.map(alumnus => (
-              <AlumniCard key={alumnus.id} alumnus={alumnus} />
+              <AlumniCard key={alumnus.id} alumnus={alumnus} viewMode="grid" />
             ))}
           </div>
 

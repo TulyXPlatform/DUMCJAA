@@ -6,18 +6,19 @@ import { useMutation } from '@tanstack/react-query';
 import { apiClient } from '../../../api/axios';
 import toast from 'react-hot-toast';
 import { X, Loader2 } from 'lucide-react';
+import { type Event } from '../../events/types';
 
 const schema = z.object({
   title:          z.string().min(3, 'Title must be at least 3 characters'),
   description:    z.string().min(10, 'Description must be at least 10 characters'),
   eventDate:      z.string().min(1, 'Event date is required'),
   location:       z.string().min(2, 'Location is required'),
-  maxAttendees:   z.coerce.number().int().positive().optional().or(z.literal('')),
+  maxAttendees:   z.union([z.coerce.number().int().positive(), z.literal('')]).optional(),
 });
 
 type FormValues = z.infer<typeof schema>;
 
-interface Event { id: string; title: string; description: string; eventDate: string; location: string; maxAttendees?: number }
+
 
 interface Props {
   isOpen: boolean;
@@ -74,7 +75,7 @@ export const EventFormModal: React.FC<Props> = ({ isOpen, event, onClose, onSucc
           <button className="modal-close-btn" onClick={onClose} aria-label="Close"><X size={20} /></button>
         </div>
 
-        <form className="modal-form" onSubmit={handleSubmit(v => mutation.mutate(v))}>
+        <form className="modal-form" onSubmit={handleSubmit((v: FormValues) => mutation.mutate(v))}>
           <div className="form-grid">
             <div className="form-field form-field--full">
               <label className="form-label" htmlFor="evt-title">Event Title *</label>

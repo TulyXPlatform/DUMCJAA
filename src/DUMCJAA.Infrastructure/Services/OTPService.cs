@@ -2,6 +2,7 @@ using DUMCJAA.Domain.Entities;
 using DUMCJAA.Domain.Interfaces;
 using DUMCJAA.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using DUMCJAA.Domain.Common;
 using System.Security.Cryptography;
 
 namespace DUMCJAA.Infrastructure.Services;

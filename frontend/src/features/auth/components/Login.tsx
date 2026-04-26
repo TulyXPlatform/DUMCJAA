@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema, LoginFormData } from '../types/schemas';
+import { loginSchema, type LoginFormData } from '../types/schemas';
 import { useLogin } from '../api/useAuth';
 import { Link } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
@@ -46,7 +46,7 @@ export const Login: React.FC = () => {
           <div className="form-group">
             <div className="label-row">
               <label className="form-label" htmlFor="password">Password</label>
-              <Link to="/forgot-password" size={14} className="forgot-link">Forgot Password?</Link>
+              <Link to="/forgot-password" className="forgot-link">Forgot Password?</Link>
             </div>
             <div className="input-with-icon">
               <Lock className="input-icon" size={18} />

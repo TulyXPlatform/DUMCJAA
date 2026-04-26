@@ -1,6 +1,25 @@
 import React from 'react';
-import { Linkedin, Mail, Building, GraduationCap } from 'lucide-react';
-import { Alumnus } from '../types';
+import { Mail, Building, GraduationCap } from 'lucide-react';
+import type { Alumnus } from '../types';
+
+const LinkedinIcon = ({ size = 24, ...props }: any) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+    <rect width="4" height="12" x="2" y="9" />
+    <circle cx="4" cy="4" r="2" />
+  </svg>
+);
 
 interface AlumniCardProps {
   alumnus: Alumnus;
@@ -45,7 +64,7 @@ export const AlumniCard: React.FC<AlumniCardProps> = ({ alumnus, viewMode }) => 
         <div className="alumni-list-actions">
           {alumnus.linkedInUrl && (
             <a href={alumnus.linkedInUrl} target="_blank" rel="noopener noreferrer" className="alumni-icon-btn" aria-label="LinkedIn">
-              <Linkedin size={16} />
+              <LinkedinIcon size={16} />
             </a>
           )}
           <a href={`mailto:${alumnus.email}`} className="alumni-icon-btn" aria-label="Email">
@@ -84,7 +103,7 @@ export const AlumniCard: React.FC<AlumniCardProps> = ({ alumnus, viewMode }) => 
         <div className="alumni-grid-actions">
           {alumnus.linkedInUrl && (
             <a href={alumnus.linkedInUrl} target="_blank" rel="noopener noreferrer" className="alumni-icon-btn" aria-label="LinkedIn">
-              <Linkedin size={15} />
+              <LinkedinIcon size={15} />
             </a>
           )}
           <a href={`mailto:${alumnus.email}`} className="alumni-icon-btn alumni-icon-btn--primary" aria-label="Email">

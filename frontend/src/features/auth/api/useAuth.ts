@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { apiClient } from '../../../api/axios';
-import { LoginFormData, RegisterFormData } from '../types/schemas';
+import type { LoginFormData, RegisterFormData } from '../types/schemas';
 import toast from 'react-hot-toast';
 
 interface AuthResponse {

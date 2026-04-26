@@ -5,16 +5,9 @@ import toast from 'react-hot-toast';
 import { Plus, Calendar, MapPin, Users, Edit2, Trash2, Search } from 'lucide-react';
 import { DataTable, type Column } from '../../../components/DataTable';
 import { EventFormModal } from './EventFormModal';
+import { type Event } from '../../events/types';
 
-interface Event {
-  id: string;
-  title: string;
-  eventDate: string;
-  location: string;
-  maxAttendees?: number;
-  currentRegistrationsCount: number;
-  isFull: boolean;
-}
+
 
 export const AdminEvents: React.FC = () => {
   const queryClient = useQueryClient();

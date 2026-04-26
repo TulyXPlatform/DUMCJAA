@@ -64,10 +64,10 @@ public class AlumnusService : IAlumnusService
         if (!string.IsNullOrWhiteSpace(parameters.SortBy))
         {
             var sortBy = parameters.SortBy.ToLower();
-            if (sortBy == "name" || sortBy == "firstname") orderBy = x => x.FirstName;
-            else if (sortBy == "batch") orderBy = x => x.Batch;
-            else if (sortBy == "department") orderBy = x => x.Department;
-            else orderBy = x => x.CreatedAt;
+            if (sortBy == "name" || sortBy == "firstname") orderBy = x => x.FirstName!;
+            else if (sortBy == "batch") orderBy = x => x.Batch!;
+            else if (sortBy == "department") orderBy = x => x.Department!;
+            else orderBy = x => x.CreatedAt!;
         }
 
         var (items, totalCount) = await _alumnusRepository.GetPagedAsync(
