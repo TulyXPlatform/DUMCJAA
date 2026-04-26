@@ -7,6 +7,7 @@ import { apiClient } from '../../../api/axios';
 import toast from 'react-hot-toast';
 import { X, Loader2 } from 'lucide-react';
 import { type Event } from '../../events/types';
+import { getHttpErrorMessage } from '../../../lib/httpError';
 
 const schema = z.object({
   title:          z.string().min(3, 'Title must be at least 3 characters'),
@@ -65,7 +66,7 @@ export const EventFormModal: React.FC<Props> = ({ isOpen, event, onClose, onSucc
       onSuccess();
       onClose();
     },
-    onError: (err: any) => toast.error(err?.response?.data?.message ?? 'Save failed'),
+    onError: (err: unknown) => toast.error(getHttpErrorMessage(err, 'Save failed')),
   });
 
   if (!isOpen) return null;
@@ -78,7 +79,7 @@ export const EventFormModal: React.FC<Props> = ({ isOpen, event, onClose, onSucc
           <button className="modal-close-btn" onClick={onClose} aria-label="Close"><X size={20} /></button>
         </div>
 
-        <form className="modal-form" onSubmit={handleSubmit(v => mutation.mutate(v as any))}>
+        <form className="modal-form" onSubmit={handleSubmit((values) => mutation.mutate(values))}>
           <div className="form-grid">
             <div className="form-field form-field--full">
               <label className="form-label" htmlFor="evt-title">Event Title *</label>
