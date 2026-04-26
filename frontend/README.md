@@ -84,3 +84,13 @@ Example for Render-hosted API:
 - `VITE_API_URL=https://dumcjaa-api.onrender.com/api`
 
 > Important: include the `/api` suffix, because frontend API calls are made like `apiClient.post('/auth/login')`.
+
+
+## If Vercel URL shows blank / unauthorized
+
+Check these in order:
+
+1. **Deployment Protection**: If Vercel has authentication enabled (Password Protection / Vercel Authentication), public visitors will see unauthorized/empty behavior until allowed.
+2. **Environment Variable**: Ensure `VITE_API_URL` is set for the same environment (Production/Preview) and includes `/api`.
+3. **Redeploy after env changes**: Vite reads env vars at build time, so update + redeploy.
+4. **Browser console**: If the page shell loads but data is missing, inspect failed network calls to verify API domain/CORS.
