@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { Mail, ArrowRight, ShieldCheck, Loader2 } from 'lucide-react';
 import axios from 'axios';
+import { getHttpErrorMessage } from '../../../lib/httpError';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -16,7 +17,7 @@ export const PasswordResetFlow = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    let interval: any;
+    let interval: ReturnType<typeof setInterval> | undefined;
     if (timer > 0) {
       interval = setInterval(() => setTimer((t) => t - 1), 1000);
     }
@@ -31,8 +32,8 @@ export const PasswordResetFlow = () => {
       toast.success('Verification code sent to your email.');
       setStep('verify');
       setTimer(300); // 5 minutes
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Failed to send code.');
+    } catch (err: unknown) {
+      toast.error(getHttpErrorMessage(err, 'Failed to send code.'));
     } finally {
       setLoading(false);
     }
@@ -45,8 +46,8 @@ export const PasswordResetFlow = () => {
       await axios.post(`${API_URL}/auth/verify-otp`, { email, code });
       toast.success('Code verified successfully.');
       setStep('reset');
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Invalid or expired code.');
+    } catch (err: unknown) {
+      toast.error(getHttpErrorMessage(err, 'Invalid or expired code.'));
     } finally {
       setLoading(false);
     }
@@ -59,8 +60,8 @@ export const PasswordResetFlow = () => {
       await axios.post(`${API_URL}/auth/change-password`, { email, code, newPassword });
       toast.success('Password changed successfully. Please login.');
       navigate('/login');
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Failed to change password.');
+    } catch (err: unknown) {
+      toast.error(getHttpErrorMessage(err, 'Failed to change password.'));
     } finally {
       setLoading(false);
     }

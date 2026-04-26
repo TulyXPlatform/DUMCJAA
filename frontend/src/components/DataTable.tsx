@@ -92,7 +92,7 @@ export function DataTable<T extends { id: string }>({
                     >
                       {col.render
                         ? col.render(row, idx)
-                        : String((row as any)[col.key] ?? '—')}
+                        : String(row[col.key as keyof T] ?? '—')}
                     </td>
                   ))}
                 </tr>

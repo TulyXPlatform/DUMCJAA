@@ -155,16 +155,20 @@ try
     }
 
     app.UseHttpsRedirection();
-    
-    // Enable serving static files from wwwroot (needed for local uploads)
+
+    // Serve the React app (built files copied to wwwroot during container build)
+    app.UseDefaultFiles();
     app.UseStaticFiles();
-    
+
     app.UseCors("AllowFrontend");
     
     app.UseAuthentication();
     app.UseAuthorization();
     
     app.MapControllers();
+
+    // Let client-side routes (e.g. /events/123) resolve to React's index.html
+    app.MapFallbackToFile("index.html");
 
     app.Run();
 }
