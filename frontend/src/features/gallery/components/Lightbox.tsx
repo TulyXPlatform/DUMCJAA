@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback } from 'react';
 import { X, ChevronLeft, ChevronRight, Camera, Calendar } from 'lucide-react';
-import { GalleryItem } from '../types';
+import type { GalleryItem } from '../types';
 import { isGradient } from '../data/gallery';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 

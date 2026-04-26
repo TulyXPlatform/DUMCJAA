@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import toast from 'react-hot-toast';
-import { Save, Loader2, Globe, Lock, Bell, Database } from 'lucide-react';
+import { Save, Globe, Lock, Database } from 'lucide-react';
 
 const schema = z.object({
   platformName:    z.string().min(2, 'Name is required'),

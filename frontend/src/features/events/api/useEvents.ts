@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../../api/axios';
-import { Event, PagedResult, ApiResponse, EventQueryParams } from '../types';
+import type { Event, PagedResult, ApiResponse, EventQueryParams } from '../types';
 import toast from 'react-hot-toast';
 
 const EVENTS_KEY = 'events';

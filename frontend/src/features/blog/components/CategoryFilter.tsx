@@ -1,5 +1,5 @@
 import React from 'react';
-import { CATEGORIES, Category } from '../types';
+import { CATEGORIES, type Category } from '../types';
 
 interface CategoryFilterProps {
   active: Category;

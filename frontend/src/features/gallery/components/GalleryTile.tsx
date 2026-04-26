@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ZoomIn } from 'lucide-react';
-import { GalleryItem } from '../types';
+import type { GalleryItem } from '../types';
 import { isGradient } from '../data/gallery';
 import { useLazyLoad } from '../hooks/useLazyLoad';
 

@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../../api/axios';
 import toast from 'react-hot-toast';
 import { CheckCircle, XCircle, Search, UserPlus } from 'lucide-react';
-import { DataTable, Column } from '../../../components/DataTable';
+import { DataTable, type Column } from '../../../components/DataTable';
 
 interface Alumnus {
   id: string;

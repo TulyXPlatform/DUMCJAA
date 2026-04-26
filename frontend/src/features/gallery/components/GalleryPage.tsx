@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { Image } from 'lucide-react';
-import { GALLERY_CATEGORIES, GalleryCategory } from '../types';
+import { GALLERY_CATEGORIES, type GalleryCategory } from '../types';
 import { GALLERY_ITEMS } from '../data/gallery';
 import { GalleryTile } from './GalleryTile';
 import { Lightbox } from './Lightbox';

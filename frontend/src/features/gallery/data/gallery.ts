@@ -1,4 +1,4 @@
-import { GalleryItem } from '../types';
+import type { GalleryItem } from '../types';
 
 // Gradients simulating real album photos until a backend file API is connected.
 // Colors are deterministic per item so refreshes don't scramble the grid.

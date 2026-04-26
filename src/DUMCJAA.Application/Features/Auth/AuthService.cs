@@ -1,5 +1,6 @@
 using DUMCJAA.Application.Common.Exceptions;
 using DUMCJAA.Application.Features.Auth.DTOs;
+using DUMCJAA.Domain.Common;
 using DUMCJAA.Domain.Entities;
 using DUMCJAA.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -38,7 +39,7 @@ public class AuthService : IAuthService
     {
         var user = await _userRepository.GetByEmailWithSecurityAsync(dto.Email, ct);
 
-        if (user is null || !_passwordHasher.VerifyPassword(dto.Password, user.PasswordHash))
+        if (user is null || !_passwordHasher.Verify(dto.Password, user.PasswordHash))
         {
             _logger.LogWarning("Failed login attempt for {Email}", dto.Email);
             throw new UnauthorizedException("Invalid email or password.");
@@ -75,7 +76,7 @@ public class AuthService : IAuthService
         var user = new User
         {
             Email = dto.Email.ToLowerInvariant(),
-            PasswordHash = _passwordHasher.HashPassword(dto.Password),
+            PasswordHash = _passwordHasher.Hash(dto.Password),
             FirstName = dto.FirstName,
             LastName = dto.LastName,
             IsActive = true,
@@ -147,7 +148,7 @@ public class AuthService : IAuthService
         var isValid = await _otpService.VerifyOTPAsync(user.Id, dto.Code, OTPType.PasswordReset);
         if (!isValid) throw new UnauthorizedException("Invalid or expired code.");
 
-        user.PasswordHash = _passwordHasher.HashPassword(dto.NewPassword);
+        user.PasswordHash = _passwordHasher.Hash(dto.NewPassword);
         await _userRepository.UpdateAsync(user, ct);
         await _unitOfWork.SaveChangesAsync(ct);
     }

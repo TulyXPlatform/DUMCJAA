@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Plus, Edit2, Eye, Search } from 'lucide-react';
-import { DataTable, Column } from '../../../components/DataTable';
+import { DataTable, type Column } from '../../../components/DataTable';
 import { STATIC_POSTS } from '../../blog/data/posts';
-import { PostSummary } from '../../blog/types';
+import type { PostSummary } from '../../blog/types';
 
 export const AdminNews: React.FC = () => {
   const [page, setPage] = useState(1);

@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { Search, X, Newspaper } from 'lucide-react';
-import { PostCard, PostCardSkeleton } from './PostCard';
+import { PostCard } from './PostCard';
 import { CategoryFilter } from './CategoryFilter';
 import { STATIC_POSTS } from '../data/posts';
-import { Category } from '../types';
+import type { Category } from '../types';
 import './Blog.css';
 
 const PAGE_SIZE = 6;

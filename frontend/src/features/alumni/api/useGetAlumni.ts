@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../../../api/axios';
-import { Alumnus, PagedResult, ApiResponse, AlumnusPaginationParams } from '../types';
+import type { Alumnus, PagedResult, ApiResponse, AlumnusPaginationParams } from '../types';
 
 export const useGetAlumni = (params: AlumnusPaginationParams) => {
   return useQuery({

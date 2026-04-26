@@ -1,7 +1,7 @@
 // Static blog posts — in production these would come from a CMS API (/api/posts).
 // Using static data here makes the blog resilient to backend downtime and
 // allows content editors to write posts without a deploy cycle.
-import { PostSummary, Post } from '../types';
+import type { PostSummary, Post } from '../types';
 
 export const STATIC_POSTS: PostSummary[] = [
   {

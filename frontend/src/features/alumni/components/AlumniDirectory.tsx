@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useGetAlumni } from '../api/useGetAlumni';
 import { AlumniCard, AlumniCardSkeleton } from './AlumniCard';
 import { SearchBar } from './SearchBar';
-import { FilterSidebar, AlumniFilters } from './FilterSidebar';
+import { FilterSidebar, type AlumniFilters } from './FilterSidebar';
 import { LayoutGrid, List, SlidersHorizontal, Users, ChevronLeft, ChevronRight } from 'lucide-react';
 import './AlumniDirectory.css';
 

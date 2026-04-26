@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../../api/axios';
 import toast from 'react-hot-toast';
 import { Plus, Calendar, MapPin, Users, Edit2, Trash2, Search } from 'lucide-react';
-import { DataTable, Column } from '../../../components/DataTable';
+import { DataTable, type Column } from '../../../components/DataTable';
 import { EventFormModal } from './EventFormModal';
 
 interface Event {

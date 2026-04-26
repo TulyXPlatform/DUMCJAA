@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../../../api/axios';
 import { Link } from 'react-router-dom';
-import { Calendar, MapPin, Users } from 'lucide-react';
+import { MapPin, Users } from 'lucide-react';
 
 interface Event {
   id: string;
