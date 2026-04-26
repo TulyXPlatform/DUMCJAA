@@ -1,33 +1,58 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Shield, Plus, Check, Loader2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+interface Permission {
+  id: string;
+  name: string;
+}
+
+interface RolePermission {
+  permissionId: string;
+  permission: Permission;
+}
+
+interface Role {
+  id: string;
+  name: string;
+  description?: string;
+  rolePermissions: RolePermission[];
+}
+
+interface ApiListResponse<T> {
+  data: T[];
+}
+
+interface ApiErrorResponse {
+  message?: string;
+}
+
 export const RoleManagement = () => {
-  const [roles, setRoles] = useState<any[]>([]);
-  const [permissions, setPermissions] = useState<any[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [permissions, setPermissions] = useState<Permission[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const [rolesRes, permRes] = await Promise.all([
-        axios.get(`${API_URL}/admin/roles`),
-        axios.get(`${API_URL}/admin/permissions`)
+        axios.get<ApiListResponse<Role>>(`${API_URL}/admin/roles`),
+        axios.get<ApiListResponse<Permission>>(`${API_URL}/admin/permissions`)
       ]);
       setRoles(rolesRes.data.data);
       setPermissions(permRes.data.data);
-    } catch (err) {
+    } catch {
       toast.error('Failed to fetch roles or permissions.');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const assignPermission = async (roleId: string, permissionId: string) => {
     try {
@@ -36,8 +61,9 @@ export const RoleManagement = () => {
       });
       toast.success('Permission assigned.');
       fetchData(); // Refresh to show the new state
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Failed to assign permission.');
+    } catch (err) {
+      const error = err as { response?: { data?: ApiErrorResponse } };
+      toast.error(error.response?.data?.message || 'Failed to assign permission.');
     }
   };
 
@@ -66,7 +92,7 @@ export const RoleManagement = () => {
             <div className="p-6">
               <h4 className="text-sm font-semibold text-neutral-400 uppercase tracking-wider mb-4">Assigned Permissions</h4>
               <div className="flex flex-wrap gap-2">
-                {role.rolePermissions.map((rp: any) => (
+                {role.rolePermissions.map((rp) => (
                   <span key={rp.permissionId} className="inline-flex items-center gap-1.5 px-3 py-1 bg-brand-50 text-brand-700 text-xs font-medium rounded-full border border-brand-100">
                     <Check className="w-3 h-3" /> {rp.permission.name}
                   </span>
@@ -77,7 +103,7 @@ export const RoleManagement = () => {
                 <h4 className="text-sm font-semibold text-neutral-400 uppercase tracking-wider mb-4">Available Permissions</h4>
                 <div className="flex flex-wrap gap-2">
                   {permissions
-                    .filter(p => !role.rolePermissions.some((rp: any) => rp.permissionId === p.id))
+                    .filter((p) => !role.rolePermissions.some((rp) => rp.permissionId === p.id))
                     .map((p) => (
                       <button
                         key={p.id}
