@@ -5,14 +5,8 @@ import { Toaster } from 'react-hot-toast';
 import { queryClient } from './api/queryClient';
 import { AppRouter } from './routes';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { LoadingFallback } from './components/LoadingFallback';
 import './index.css';
-
-const LoadingFallback = () => (
-  <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-    <div className="skeleton" style={{ height: '64px', width: '100%' }} />
-    <div className="skeleton" style={{ height: '300px', width: '100%' }} />
-  </div>
-);
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

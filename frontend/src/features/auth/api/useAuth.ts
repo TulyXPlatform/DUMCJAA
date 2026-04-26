@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { apiClient } from '../../../api/axios';
 import type { LoginFormData, RegisterFormData } from '../types/schemas';
 import toast from 'react-hot-toast';
+import type { AxiosError } from 'axios';
 
 interface AuthResponse {
   success: boolean;
@@ -16,6 +17,10 @@ interface AuthResponse {
       role: string;
     }
   }
+}
+
+interface ApiErrorResponse {
+  message?: string;
 }
 
 export const useLogin = () => {
@@ -40,7 +45,7 @@ export const useLogin = () => {
         navigate('/alumni');
       }
     },
-    onError: (error: any) => {
+    onError: (error: AxiosError<ApiErrorResponse>) => {
       toast.error(error.response?.data?.message || 'Invalid email or password');
     }
   });
@@ -52,7 +57,7 @@ export const useRegister = () => {
   return useMutation({
     mutationFn: async (data: RegisterFormData) => {
       // Omit confirmPassword before sending to backend
-      const { confirmPassword, ...payload } = data;
+      const { confirmPassword: _confirmPassword, ...payload } = data;
       const response = await apiClient.post<AuthResponse>('/auth/register', payload);
       return response.data;
     },
@@ -62,7 +67,7 @@ export const useRegister = () => {
       toast.success('Registration successful!');
       navigate('/alumni');
     },
-    onError: (error: any) => {
+    onError: (error: AxiosError<ApiErrorResponse>) => {
       toast.error(error.response?.data?.message || 'Registration failed. Please check your inputs.');
     }
   });
