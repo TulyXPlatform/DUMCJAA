@@ -11,9 +11,19 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        var connectionString = configuration.GetConnectionString("DefaultConnection") ?? "";
+        
+        // Failsafe: If the user accidentally pastes an Azure connection string containing ActiveDirectoryDefault 
+        // into Render Environment Variables, it will crash the app because Render doesn't support it.
+        // We forcefully strip it out to force SQL Authentication instead.
+        if (connectionString.Contains("Authentication=ActiveDirectoryDefault;", StringComparison.OrdinalIgnoreCase))
+        {
+            connectionString = connectionString.Replace("Authentication=ActiveDirectoryDefault;", "", StringComparison.OrdinalIgnoreCase);
+        }
+
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(
-                configuration.GetConnectionString("DefaultConnection"),
+                connectionString,
                 b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
 
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
