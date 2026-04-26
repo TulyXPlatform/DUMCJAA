@@ -110,14 +110,7 @@ try
     {
         options.AddPolicy("AllowFrontend", policy =>
         {
-            var configuredOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? ["http://localhost:3000"];
-            var allowedOrigins = configuredOrigins
-                .Select(o => o.Trim())
-                .Where(o => !string.IsNullOrWhiteSpace(o))
-                .ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-            policy.SetIsOriginAllowed(origin =>
-                IsAllowedOrigin(origin, allowedOrigins, builder.Environment.IsDevelopment()))
+            policy.AllowAnyOrigin()
                 .AllowAnyMethod()
                 .AllowAnyHeader();
         });
