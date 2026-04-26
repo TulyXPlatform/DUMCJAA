@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.HttpOverrides;
 using DUMCJAA.API.Middleware;
 using DUMCJAA.Application;
 using DUMCJAA.Infrastructure;
@@ -96,6 +97,14 @@ try
     builder.Services.AddScoped<Microsoft.AspNetCore.Authorization.IAuthorizationHandler, DUMCJAA.Infrastructure.Auth.PermissionAuthorizationHandler>();
     builder.Services.AddAuthorization();
 
+    // Trust reverse-proxy headers (Render / Nginx) so HTTPS redirection works correctly
+    builder.Services.Configure<ForwardedHeadersOptions>(options =>
+    {
+        options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+        options.KnownNetworks.Clear();
+        options.KnownProxies.Clear();
+    });
+
     // ── CORS ──
     builder.Services.AddCors(options =>
     {
@@ -154,6 +163,8 @@ try
         app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "DUMCJAA API v1"));
     }
 
+    app.UseForwardedHeaders();
+
     app.UseHttpsRedirection();
 
     // Serve the React app (built files copied to wwwroot during container build)
@@ -166,6 +177,9 @@ try
     app.UseAuthorization();
     
     app.MapControllers();
+
+    // Lightweight probes for Render health checks
+    app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 
     // Let client-side routes (e.g. /events/123) resolve to React's index.html
     app.MapFallbackToFile("index.html");

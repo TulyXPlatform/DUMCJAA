@@ -39,7 +39,7 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 
 # Render uses the PORT environment variable
-ENV ASPNETCORE_URLS=http://+:10000
+ENV PORT=10000
 EXPOSE 10000
 
-ENTRYPOINT ["dotnet", "DUMCJAA.API.dll"]
+ENTRYPOINT ["sh", "-c", "ASPNETCORE_URLS=http://+:${PORT:-10000} dotnet DUMCJAA.API.dll"]
