@@ -13,7 +13,10 @@ const schema = z.object({
   description:    z.string().min(10, 'Description must be at least 10 characters'),
   eventDate:      z.string().min(1, 'Event date is required'),
   location:       z.string().min(2, 'Location is required'),
-  maxAttendees:   z.union([z.coerce.number().int().positive(), z.literal('')]).optional(),
+  maxAttendees:   z.preprocess(
+                    (val) => (val === '' ? undefined : val),
+                    z.coerce.number().int().positive().optional()
+                  ),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -42,10 +45,10 @@ export const EventFormModal: React.FC<Props> = ({ isOpen, event, onClose, onSucc
         description:  event.description,
         eventDate:    event.eventDate.slice(0, 16),   // datetime-local format
         location:     event.location,
-        maxAttendees: event.maxAttendees ?? '',
+        maxAttendees: event.maxAttendees ?? undefined,
       });
     } else {
-      reset({ title: '', description: '', eventDate: '', location: '', maxAttendees: '' });
+      reset({ title: '', description: '', eventDate: '', location: '', maxAttendees: undefined });
     }
   }, [event, reset]);
 
@@ -75,7 +78,7 @@ export const EventFormModal: React.FC<Props> = ({ isOpen, event, onClose, onSucc
           <button className="modal-close-btn" onClick={onClose} aria-label="Close"><X size={20} /></button>
         </div>
 
-        <form className="modal-form" onSubmit={handleSubmit((v: FormValues) => mutation.mutate(v))}>
+        <form className="modal-form" onSubmit={handleSubmit(v => mutation.mutate(v as FormValues))}>
           <div className="form-grid">
             <div className="form-field form-field--full">
               <label className="form-label" htmlFor="evt-title">Event Title *</label>
