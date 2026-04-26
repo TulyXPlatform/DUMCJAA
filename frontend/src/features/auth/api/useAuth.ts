@@ -57,7 +57,12 @@ export const useRegister = () => {
   return useMutation({
     mutationFn: async (data: RegisterFormData) => {
       // Omit confirmPassword before sending to backend
-      const { confirmPassword: _confirmPassword, ...payload } = data;
+      const payload = {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        password: data.password,
+      };
       const response = await apiClient.post<AuthResponse>('/auth/register', payload);
       return response.data;
     },
