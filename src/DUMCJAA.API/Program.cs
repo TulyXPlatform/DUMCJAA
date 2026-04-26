@@ -115,9 +115,24 @@ try
     using (var scope = app.Services.CreateScope())
     {
         var services = scope.ServiceProvider;
-        var context = services.GetRequiredService<DUMCJAA.Infrastructure.Persistence.ApplicationDbContext>();
-        var passwordHasher = services.GetRequiredService<DUMCJAA.Domain.Interfaces.IPasswordHasher>();
-        await DUMCJAA.Infrastructure.Persistence.DbInitializer.SeedAsync(context, passwordHasher);
+        try
+        {
+            var context = services.GetRequiredService<DUMCJAA.Infrastructure.Persistence.ApplicationDbContext>();
+            var passwordHasher = services.GetRequiredService<DUMCJAA.Domain.Interfaces.IPasswordHasher>();
+            await DUMCJAA.Infrastructure.Persistence.DbInitializer.SeedAsync(context, passwordHasher);
+        }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "\n=======================================================\n" +
+                          "DATABASE CONNECTION FAILED ON STARTUP!\n" +
+                          "Please check the following:\n" +
+                          "1. Did you set the ConnectionStrings__DefaultConnection environment variable in Render?\n" +
+                          "2. Is your Azure SQL Firewall configured to allow access from Render's IP addresses?\n" +
+                          "   (You may need to enable 'Allow Azure services and resources to access this server').\n" +
+                          "3. Are your database username and password correct?\n" +
+                          "=======================================================\n");
+            throw; // Rethrow to halt startup
+        }
     }
 
     // ── Middleware pipeline ──
