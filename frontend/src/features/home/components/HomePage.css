@@ -57,6 +57,34 @@
   padding: 2rem;
 }
 
+.section-error-card {
+  border: 1px solid #fecaca;
+  background: #fff1f2;
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  text-align: center;
+  max-width: 520px;
+  margin: 0 auto;
+  display: grid;
+  gap: 0.625rem;
+}
+
+.section-error-card h3 {
+  margin: 0;
+  font-size: 1.125rem;
+  color: #9f1239;
+}
+
+.section-error-card p {
+  margin: 0;
+  color: #881337;
+}
+
+.section-error-card .btn {
+  justify-self: center;
+  min-width: 120px;
+}
+
 .three-col-grid {
   display: grid;
   grid-template-columns: 1fr;
