@@ -78,7 +78,7 @@ const SkeletonCard: React.FC = () => (
 );
 
 export const FeaturedAlumniSection: React.FC = () => {
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, refetch, isFetching } = useQuery({
     queryKey: ['featured-alumni'],
     queryFn: async () => {
       const res = await apiClient.get('/alumni', { params: { page: 1, pageSize: 3 } });
@@ -99,7 +99,13 @@ export const FeaturedAlumniSection: React.FC = () => {
         </div>
 
         {isError ? (
-          <p className="section-error">Could not load alumni. Please try again later.</p>
+          <div className="section-error-card">
+            <h3>Couldn’t load featured alumni</h3>
+            <p>There was a temporary connection issue. Please try again.</p>
+            <button className="btn btn-outline" onClick={() => refetch()} disabled={isFetching}>
+              {isFetching ? 'Retrying...' : 'Retry'}
+            </button>
+          </div>
         ) : (
           <div className="three-col-grid">
             {isLoading

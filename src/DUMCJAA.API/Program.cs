@@ -110,13 +110,44 @@ try
     {
         options.AddPolicy("AllowFrontend", policy =>
         {
-            var origins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? ["http://localhost:3000"];
-            policy.WithOrigins(origins)
+            var configuredOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? ["http://localhost:3000"];
+            var allowedOrigins = configuredOrigins
+                .Select(o => o.Trim())
+                .Where(o => !string.IsNullOrWhiteSpace(o))
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            policy.SetIsOriginAllowed(origin =>
+                IsAllowedOrigin(origin, allowedOrigins, builder.Environment.IsDevelopment()))
                 .AllowAnyMethod()
-                .AllowAnyHeader()
-                .AllowCredentials();
+                .AllowAnyHeader();
         });
     });
+
+    static bool IsAllowedOrigin(string? origin, HashSet<string> configuredOrigins, bool isDevelopment)
+    {
+        if (string.IsNullOrWhiteSpace(origin))
+            return false;
+
+        if (configuredOrigins.Contains(origin))
+            return true;
+
+        if (!Uri.TryCreate(origin, UriKind.Absolute, out var uri))
+            return false;
+
+        var host = uri.Host.ToLowerInvariant();
+
+        // Allow Vercel preview and production frontend domains over HTTPS.
+        if (uri.Scheme == Uri.UriSchemeHttps &&
+            (host.EndsWith(".vercel.app") || host == "dumcjaa.com" || host == "www.dumcjaa.com"))
+            return true;
+
+        // Keep local developer convenience.
+        if (isDevelopment &&
+            (host == "localhost" || host == "127.0.0.1"))
+            return true;
+
+        return false;
+    }
 
     var app = builder.Build();
 
