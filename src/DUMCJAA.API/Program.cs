@@ -123,14 +123,21 @@ try
         }
         catch (Exception ex)
         {
-            Log.Fatal(ex, "\n=======================================================\n" +
-                          "DATABASE CONNECTION FAILED ON STARTUP!\n" +
-                          "Please check the following:\n" +
-                          "1. Did you set the ConnectionStrings__DefaultConnection environment variable in Render?\n" +
-                          "2. Is your Azure SQL Firewall configured to allow access from Render's IP addresses?\n" +
-                          "   (You may need to enable 'Allow Azure services and resources to access this server').\n" +
-                          "3. Are your database username and password correct?\n" +
-                          "=======================================================\n");
+            var msg = "\n=======================================================\n" +
+                      "FATAL ERROR: DATABASE CONNECTION FAILED ON STARTUP!\n" +
+                      "=======================================================\n" +
+                      "Please check the following:\n" +
+                      "1. Did you set the ConnectionStrings__DefaultConnection environment variable in Render?\n" +
+                      "2. Is your Azure SQL Firewall configured to allow access from Render's IP addresses?\n" +
+                      "   (You may need to enable 'Allow Azure services and resources to access this server').\n" +
+                      "3. Are your database username and password correct?\n" +
+                      "=======================================================\n";
+                      
+            Console.WriteLine(msg);
+            Console.WriteLine(ex.ToString());
+            
+            Log.Fatal(ex, "DATABASE CONNECTION FAILED ON STARTUP");
+            Log.CloseAndFlush();
             throw; // Rethrow to halt startup
         }
     }

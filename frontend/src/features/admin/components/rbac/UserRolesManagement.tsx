@@ -17,7 +17,6 @@ interface Role {
 }
 
 export const UserRolesManagement: React.FC = () => {
-  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -125,7 +124,7 @@ const UserRolesModal: React.FC<{ user: User, onClose: () => void }> = ({ user, o
     }
   });
 
-  const { data: userRoles, isLoading } = useQuery({
+  const { isLoading } = useQuery({
     queryKey: ['user-roles', user.id],
     queryFn: async () => {
       const res = await apiClient.get(`/users/${user.id}/roles`);
