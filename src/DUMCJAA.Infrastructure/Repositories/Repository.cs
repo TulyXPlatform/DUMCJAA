@@ -87,4 +87,9 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
     {
         return await _dbSet.AnyAsync(predicate, ct);
     }
+
+    public IQueryable<T> GetWhere(Expression<Func<T, bool>> predicate)
+    {
+        return _dbSet.Where(predicate);
+    }
 }

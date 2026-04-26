@@ -46,6 +46,11 @@ public class GlobalExceptionMiddleware
                 validation.Message,
                 validation.Errors),
 
+            BadRequestException badRequest => (
+                HttpStatusCode.BadRequest,
+                badRequest.Message,
+                (List<string>?)null),
+
             UnauthorizedException unauthorized => (
                 HttpStatusCode.Unauthorized,
                 unauthorized.Message,

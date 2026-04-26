@@ -26,6 +26,15 @@ public class ValidationException : Exception
 }
 
 /// <summary>
+/// Thrown on general bad requests.
+/// Mapped to 400 by global exception middleware.
+/// </summary>
+public class BadRequestException : Exception
+{
+    public BadRequestException(string message) : base(message) { }
+}
+
+/// <summary>
 /// Thrown on business rule violations.
 /// Mapped to 409 by global exception middleware.
 /// </summary>
