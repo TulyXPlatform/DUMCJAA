@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Users, Calendar, Newspaper, Settings, LogOut, Menu, X, Shield } from 'lucide-react';
+import { useScrollToTop } from '../hooks/useScrollToTop';
 import './AdminLayout.css';
 import '../features/admin/components/Admin.css';
 
 export const AdminLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  useScrollToTop();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);

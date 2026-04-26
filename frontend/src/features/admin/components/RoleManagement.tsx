@@ -1,9 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
 import { Shield, Plus, Check, Loader2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import { apiClient } from '../../../api/axios';
 
 interface Permission {
   id: string;
@@ -38,8 +36,8 @@ export const RoleManagement = () => {
   const fetchData = useCallback(async () => {
     try {
       const [rolesRes, permRes] = await Promise.all([
-        axios.get<ApiListResponse<Role>>(`${API_URL}/admin/roles`),
-        axios.get<ApiListResponse<Permission>>(`${API_URL}/admin/permissions`)
+        apiClient.get<ApiListResponse<Role>>('/admin/roles'),
+        apiClient.get<ApiListResponse<Permission>>('/admin/permissions')
       ]);
       setRoles(rolesRes.data.data);
       setPermissions(permRes.data.data);
@@ -56,8 +54,8 @@ export const RoleManagement = () => {
 
   const assignPermission = async (roleId: string, permissionId: string) => {
     try {
-      await axios.post(`${API_URL}/admin/roles/${roleId}/permissions`, permissionId, {
-        headers: { 'Content-Type': 'application/json' }
+      await apiClient.post(`/admin/roles/${roleId}/permissions`, permissionId, {
+        headers: { 'Content-Type': 'application/json' },
       });
       toast.success('Permission assigned.');
       fetchData(); // Refresh to show the new state

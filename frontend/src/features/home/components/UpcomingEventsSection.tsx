@@ -61,7 +61,7 @@ const SkeletonEventCard: React.FC = () => (
 );
 
 export const UpcomingEventsSection: React.FC = () => {
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, refetch, isFetching } = useQuery({
     queryKey: ['upcoming-events-home'],
     queryFn: async () => {
       const res = await apiClient.get('/events', { params: { page: 1, pageSize: 3 } });
@@ -82,7 +82,13 @@ export const UpcomingEventsSection: React.FC = () => {
         </div>
 
         {isError ? (
-          <p className="section-error">Could not load events. Please try again later.</p>
+          <div className="section-error-card">
+            <h3>Couldn’t load upcoming events</h3>
+            <p>We couldn’t reach the events service right now.</p>
+            <button className="btn btn-outline" onClick={() => refetch()} disabled={isFetching}>
+              {isFetching ? 'Retrying...' : 'Retry'}
+            </button>
+          </div>
         ) : (
           <div className="three-col-grid">
             {isLoading

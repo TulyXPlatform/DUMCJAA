@@ -2,10 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { Loader2, ShieldCheck } from 'lucide-react';
-import axios from 'axios';
 import { getHttpErrorMessage } from '../../../lib/httpError';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import { apiClient } from '../../../api/axios';
 
 export const EmailVerification: React.FC = () => {
   const location = useLocation();
@@ -43,7 +41,7 @@ export const EmailVerification: React.FC = () => {
 
     setLoading(true);
     try {
-      await axios.post(`${API_URL}/auth/verify-email`, { email, code });
+      await apiClient.post('/auth/verify-email', { email, code });
       toast.success('Email verified! You can now sign in.');
       navigate('/login');
     } catch (err: unknown) {
@@ -56,7 +54,7 @@ export const EmailVerification: React.FC = () => {
   const handleResend = async () => {
     setLoading(true);
     try {
-      await axios.post(`${API_URL}/auth/request-email-verification-otp`, { email }); 
+      await apiClient.post('/auth/request-email-verification-otp', { email });
       toast.success('New code sent to your email.');
       setTimer(300);
     } catch (err: unknown) {

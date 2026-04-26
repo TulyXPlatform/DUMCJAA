@@ -110,11 +110,9 @@ try
     {
         options.AddPolicy("AllowFrontend", policy =>
         {
-            var origins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? ["http://localhost:3000"];
-            policy.WithOrigins(origins)
+            policy.AllowAnyOrigin()
                 .AllowAnyMethod()
-                .AllowAnyHeader()
-                .AllowCredentials();
+                .AllowAnyHeader();
         });
     });
 
