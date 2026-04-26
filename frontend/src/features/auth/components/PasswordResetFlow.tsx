@@ -2,10 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { Mail, ArrowRight, ShieldCheck, Loader2 } from 'lucide-react';
-import axios from 'axios';
 import { getHttpErrorMessage } from '../../../lib/httpError';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import { apiClient } from '../../../api/axios';
 
 export const PasswordResetFlow = () => {
   const [step, setStep] = useState<'request' | 'verify' | 'reset'>('request');
@@ -28,7 +26,7 @@ export const PasswordResetFlow = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post(`${API_URL}/auth/request-password-change-otp`, { email });
+      await apiClient.post('/auth/request-password-change-otp', { email });
       toast.success('Verification code sent to your email.');
       setStep('verify');
       setTimer(300); // 5 minutes
@@ -43,7 +41,7 @@ export const PasswordResetFlow = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post(`${API_URL}/auth/verify-otp`, { email, code });
+      await apiClient.post('/auth/verify-otp', { email, code });
       toast.success('Code verified successfully.');
       setStep('reset');
     } catch (err: unknown) {
@@ -57,7 +55,7 @@ export const PasswordResetFlow = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post(`${API_URL}/auth/change-password`, { email, code, newPassword });
+      await apiClient.post('/auth/change-password', { email, code, newPassword });
       toast.success('Password changed successfully. Please login.');
       navigate('/login');
     } catch (err: unknown) {

@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Outlet, Link, NavLink, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
+import { useScrollToTop } from '../hooks/useScrollToTop';
 import './MainLayout.css';
 
 export const MainLayout = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  useScrollToTop();
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
