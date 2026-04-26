@@ -47,5 +47,8 @@ public class EventRegistrationConfiguration : IEntityTypeConfiguration<EventRegi
 
         // Ensure a user can only register once per event
         builder.HasIndex(x => new { x.EventId, x.UserId }).IsUnique();
+
+        // Match the global soft-delete filter of the required Event entity
+        builder.HasQueryFilter(x => !x.Event.IsDeleted);
     }
 }
