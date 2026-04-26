@@ -1,4 +1,14 @@
-# Build Stage
+# Frontend Build Stage
+FROM node:22-alpine AS frontend-build
+WORKDIR /frontend
+
+COPY frontend/package*.json ./
+RUN npm ci
+
+COPY frontend/ ./
+RUN npm run build
+
+# Backend Build Stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
@@ -12,6 +22,10 @@ RUN dotnet restore "src/DUMCJAA.API/DUMCJAA.API.csproj"
 
 # Copy everything else and build
 COPY . .
+
+# Copy the built frontend into API wwwroot so ASP.NET can serve it
+COPY --from=frontend-build /frontend/dist ./src/DUMCJAA.API/wwwroot
+
 WORKDIR "/src/src/DUMCJAA.API"
 RUN dotnet build "DUMCJAA.API.csproj" -c Release -o /app/build
 
@@ -25,7 +39,7 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 
 # Render uses the PORT environment variable
-ENV ASPNETCORE_URLS=http://+:10000
+ENV PORT=10000
 EXPOSE 10000
 
-ENTRYPOINT ["dotnet", "DUMCJAA.API.dll"]
+ENTRYPOINT ["sh", "-c", "ASPNETCORE_URLS=http://+:${PORT:-10000} dotnet DUMCJAA.API.dll"]

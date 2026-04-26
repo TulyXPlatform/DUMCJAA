@@ -4,7 +4,7 @@ import { apiClient } from '../../../api/axios';
 import { Link } from 'react-router-dom';
 import { Mail } from 'lucide-react';
 
-const LinkedinIcon = ({ size = 24, ...props }: any) => (
+const LinkedinIcon = ({ size = 24, ...props }: React.SVGProps<SVGSVGElement> & { size?: number }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={size}

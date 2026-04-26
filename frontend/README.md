@@ -71,3 +71,16 @@ export default defineConfig([
   },
 ])
 ```
+
+
+## Deployment env vars (Vercel)
+
+Set the following in **Vercel Project Settings → Environment Variables**:
+
+- `VITE_API_URL=https://your-api-service-domain.com/api`
+
+Example for Render-hosted API:
+
+- `VITE_API_URL=https://dumcjaa-api.onrender.com/api`
+
+> Important: include the `/api` suffix, because frontend API calls are made like `apiClient.post('/auth/login')`.

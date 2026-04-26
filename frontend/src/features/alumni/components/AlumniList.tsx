@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useGetAlumni } from '../api/useGetAlumni';
 import { AlumniCard } from './AlumniCard';
 import './AlumniList.css';
+import { getHttpErrorMessage } from '../../../lib/httpError';
 
 // Custom hook to debounce search input
 function useDebounce<T>(value: T, delay: number): T {
@@ -38,7 +39,7 @@ export const AlumniList: React.FC = () => {
     return (
       <div className="alumni-state-container error">
         <h2>Failed to load Alumni Directory</h2>
-        <p>{(error as any)?.response?.data?.message || error.message}</p>
+        <p>{getHttpErrorMessage(error, 'Unexpected error while loading alumni.')}</p>
         <button className="btn btn-primary mt-4" onClick={() => window.location.reload()}>Retry</button>
       </div>
     );

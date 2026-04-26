@@ -6,6 +6,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { User, Mail, Lock, Loader2, ArrowRight } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
+import { getHttpErrorMessage } from '../../../lib/httpError';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -23,8 +24,8 @@ export const Register: React.FC = () => {
       toast.success('Account created! Please verify your email.');
       // Pass the email to the verification page via state
       navigate('/verify-email', { state: { email: data.email } });
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Registration failed.');
+    } catch (err: unknown) {
+      toast.error(getHttpErrorMessage(err, 'Registration failed.'));
     } finally {
       setLoading(false);
     }
