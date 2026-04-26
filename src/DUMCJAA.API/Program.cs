@@ -111,15 +111,19 @@ try
 
     var app = builder.Build();
 
-    // ── Seeding ──
-    using (var scope = app.Services.CreateScope())
+    // ── Seeding (Background to prevent Render Port Timeout) ──
+    _ = Task.Run(async () =>
     {
-        var services = scope.ServiceProvider;
         try
         {
+            using var scope = app.Services.CreateScope();
+            var services = scope.ServiceProvider;
             var context = services.GetRequiredService<DUMCJAA.Infrastructure.Persistence.ApplicationDbContext>();
             var passwordHasher = services.GetRequiredService<DUMCJAA.Domain.Interfaces.IPasswordHasher>();
+            
+            Console.WriteLine("Starting Database Seeding in background...");
             await DUMCJAA.Infrastructure.Persistence.DbInitializer.SeedAsync(context, passwordHasher);
+            Console.WriteLine("Database Seeding completed successfully.");
         }
         catch (Exception ex)
         {
@@ -135,12 +139,10 @@ try
                       
             Console.WriteLine(msg);
             Console.WriteLine(ex.ToString());
-            
             Log.Fatal(ex, "DATABASE CONNECTION FAILED ON STARTUP");
             Log.CloseAndFlush();
-            throw; // Rethrow to halt startup
         }
-    }
+    });
 
     // ── Middleware pipeline ──
     app.UseMiddleware<GlobalExceptionMiddleware>();
