@@ -17,6 +17,7 @@ import { AdminNews } from '../features/admin/components/AdminNews';
 import { AdminSettings } from '../features/admin/components/AdminSettings';
 import { RolesManagement } from '../features/admin/components/rbac/RolesManagement';
 import { RolePermissionsManagement } from '../features/admin/components/rbac/RolePermissionsManagement';
+import { UserRolesManagement } from '../features/admin/components/rbac/UserRolesManagement';
 import { Login } from '../features/auth/components/Login';
 import { Register } from '../features/auth/components/Register';
 import { ForgotPassword } from '../features/auth/components/ForgotPassword';
@@ -55,7 +56,8 @@ const router = createBrowserRouter([
           { path: 'news', element: <AdminNews /> },
           { path: 'settings', element: <AdminSettings /> },
           { path: 'rbac/roles', element: <RolesManagement /> },
-          { path: 'rbac/roles/:id/permissions', element: <RolePermissionsManagement /> }
+          { path: 'rbac/roles/:id/permissions', element: <RolePermissionsManagement /> },
+          { path: 'rbac/users', element: <UserRolesManagement /> }
         ]
       }
     ]

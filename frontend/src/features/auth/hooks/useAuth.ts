@@ -34,7 +34,7 @@ export const usePermission = (permission: string) => {
   if (!user) return false;
   
   // SuperAdmin bypass (optional but common)
-  if (user.roles.includes('Admin')) return true;
+  if (user.roles.includes('SuperAdmin')) return true;
   
   return user.permissions.includes(permission);
 };

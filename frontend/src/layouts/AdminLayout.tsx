@@ -58,6 +58,10 @@ export const AdminLayout: React.FC = () => {
             <Shield size={20} />
             <span>Role Management</span>
           </NavLink>
+          <NavLink to="/admin/rbac/users" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`} onClick={() => setIsSidebarOpen(false)}>
+            <Users size={20} />
+            <span>User Roles</span>
+          </NavLink>
         </nav>
 
         <div className="admin-sidebar-footer">
