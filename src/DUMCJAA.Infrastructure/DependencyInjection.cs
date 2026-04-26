@@ -13,12 +13,18 @@ public static class DependencyInjection
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection") ?? "";
         
-        // Failsafe: If the user accidentally pastes an Azure connection string containing ActiveDirectoryDefault 
-        // into Render Environment Variables, it will crash the app because Render doesn't support it.
-        // We forcefully strip it out to force SQL Authentication instead.
+        // Failsafe: Strip out Azure AD auth if accidentally pasted into Render
         if (connectionString.Contains("Authentication=ActiveDirectoryDefault;", StringComparison.OrdinalIgnoreCase))
         {
             connectionString = connectionString.Replace("Authentication=ActiveDirectoryDefault;", "", StringComparison.OrdinalIgnoreCase);
+        }
+        if (connectionString.Contains("Authentication=\"Active Directory Default\";", StringComparison.OrdinalIgnoreCase))
+        {
+            connectionString = connectionString.Replace("Authentication=\"Active Directory Default\";", "", StringComparison.OrdinalIgnoreCase);
+        }
+        if (connectionString.Contains("Authentication=Active Directory Default;", StringComparison.OrdinalIgnoreCase))
+        {
+            connectionString = connectionString.Replace("Authentication=Active Directory Default;", "", StringComparison.OrdinalIgnoreCase);
         }
 
         services.AddDbContext<ApplicationDbContext>(options =>
