@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { Loader2, ShieldCheck } from 'lucide-react';
 import axios from 'axios';
+import { getHttpErrorMessage } from '../../../lib/httpError';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -26,7 +27,7 @@ export const EmailVerification: React.FC = () => {
   }, [location, navigate]);
 
   useEffect(() => {
-    let interval: any;
+    let interval: ReturnType<typeof setInterval> | undefined;
     if (timer > 0) {
       interval = setInterval(() => setTimer((t) => t - 1), 1000);
     }
@@ -45,8 +46,8 @@ export const EmailVerification: React.FC = () => {
       await axios.post(`${API_URL}/auth/verify-email`, { email, code });
       toast.success('Email verified! You can now sign in.');
       navigate('/login');
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Verification failed.');
+    } catch (err: unknown) {
+      toast.error(getHttpErrorMessage(err, 'Verification failed.'));
     } finally {
       setLoading(false);
     }
@@ -58,8 +59,8 @@ export const EmailVerification: React.FC = () => {
       await axios.post(`${API_URL}/auth/request-email-verification-otp`, { email }); 
       toast.success('New code sent to your email.');
       setTimer(300);
-    } catch (err: any) {
-      toast.error('Failed to resend code.');
+    } catch (err: unknown) {
+      toast.error(getHttpErrorMessage(err, 'Failed to resend code.'));
     } finally {
       setLoading(false);
     }

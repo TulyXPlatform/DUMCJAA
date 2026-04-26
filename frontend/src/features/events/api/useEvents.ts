@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../../api/axios';
 import type { Event, PagedResult, ApiResponse, EventQueryParams } from '../types';
 import toast from 'react-hot-toast';
+import { getHttpErrorMessage } from '../../../lib/httpError';
 
 const EVENTS_KEY = 'events';
 
@@ -37,8 +38,8 @@ export const useRegisterForEvent = (eventId: string) => {
       // Invalidate both the list and the detail cache
       queryClient.invalidateQueries({ queryKey: [EVENTS_KEY] });
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message ?? 'Failed to register. Please try again.');
+    onError: (error: unknown) => {
+      toast.error(getHttpErrorMessage(error, 'Failed to register. Please try again.'));
     },
   });
 };
@@ -54,8 +55,8 @@ export const useUnregisterFromEvent = (eventId: string) => {
       toast.success('You have unregistered from this event.');
       queryClient.invalidateQueries({ queryKey: [EVENTS_KEY] });
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message ?? 'Failed to unregister.');
+    onError: (error: unknown) => {
+      toast.error(getHttpErrorMessage(error, 'Failed to unregister.'));
     },
   });
 };

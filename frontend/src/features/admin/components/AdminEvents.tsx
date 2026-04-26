@@ -6,6 +6,7 @@ import { Plus, Calendar, MapPin, Users, Edit2, Trash2, Search } from 'lucide-rea
 import { DataTable, type Column } from '../../../components/DataTable';
 import { EventFormModal } from './EventFormModal';
 import { type Event } from '../../events/types';
+import { getHttpErrorMessage } from '../../../lib/httpError';
 
 
 
@@ -33,7 +34,7 @@ export const AdminEvents: React.FC = () => {
       toast.success('Event deleted successfully');
       queryClient.invalidateQueries({ queryKey: ['admin-events'] });
     },
-    onError: (err: any) => toast.error(err?.response?.data?.message ?? 'Delete failed'),
+    onError: (err: unknown) => toast.error(getHttpErrorMessage(err, 'Delete failed')),
   });
 
   const handleEdit = (event: Event) => { setEditTarget(event); setModalOpen(true); };
