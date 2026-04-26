@@ -1,29 +1,37 @@
+import { lazy } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { ScrollToTop } from '../hooks/useScrollToTop';
 import { MainLayout } from '../layouts/MainLayout';
 import { AdminLayout } from '../layouts/AdminLayout';
 import { ProtectedRoute } from '../components/ProtectedRoute';
-import { HomePage } from '../features/home/components/HomePage';
-import { AlumniDirectory } from '../features/alumni/components/AlumniDirectory';
-import { EventsPage } from '../features/events/components/EventsPage';
-import { EventDetailPage } from '../features/events/components/EventDetailPage';
-import { BlogPage } from '../features/blog/components/BlogPage';
-import { PostDetailPage } from '../features/blog/components/PostDetailPage';
-import { GalleryPage } from '../features/gallery/components/GalleryPage';
-import { AdminDashboard } from '../features/admin/components/AdminDashboard';
-import { AdminAlumni } from '../features/admin/components/AdminAlumni';
-import { AdminEvents } from '../features/admin/components/AdminEvents';
-import { AdminNews } from '../features/admin/components/AdminNews';
-import { AdminSettings } from '../features/admin/components/AdminSettings';
-import { RolesManagement } from '../features/admin/components/rbac/RolesManagement';
-import { RolePermissionsManagement } from '../features/admin/components/rbac/RolePermissionsManagement';
-import { UserRolesManagement } from '../features/admin/components/rbac/UserRolesManagement';
-import { Login } from '../features/auth/components/Login';
-import { Register } from '../features/auth/components/Register';
-import { ForgotPassword } from '../features/auth/components/ForgotPassword';
 
-// Placeholder components
-const NotFound = () => <div style={{ textAlign: 'center', padding: '5rem 2rem' }}><h1 style={{ fontSize: '4rem' }}>404</h1><p>Page not found.</p></div>;
+const HomePage = lazy(() => import('../features/home/components/HomePage').then((m) => ({ default: m.HomePage })));
+const AlumniDirectory = lazy(() => import('../features/alumni/components/AlumniDirectory').then((m) => ({ default: m.AlumniDirectory })));
+const EventsPage = lazy(() => import('../features/events/components/EventsPage').then((m) => ({ default: m.EventsPage })));
+const EventDetailPage = lazy(() => import('../features/events/components/EventDetailPage').then((m) => ({ default: m.EventDetailPage })));
+const BlogPage = lazy(() => import('../features/blog/components/BlogPage').then((m) => ({ default: m.BlogPage })));
+const PostDetailPage = lazy(() => import('../features/blog/components/PostDetailPage').then((m) => ({ default: m.PostDetailPage })));
+const GalleryPage = lazy(() => import('../features/gallery/components/GalleryPage').then((m) => ({ default: m.GalleryPage })));
+
+const AdminDashboard = lazy(() => import('../features/admin/components/AdminDashboard').then((m) => ({ default: m.AdminDashboard })));
+const AdminAlumni = lazy(() => import('../features/admin/components/AdminAlumni').then((m) => ({ default: m.AdminAlumni })));
+const AdminEvents = lazy(() => import('../features/admin/components/AdminEvents').then((m) => ({ default: m.AdminEvents })));
+const AdminNews = lazy(() => import('../features/admin/components/AdminNews').then((m) => ({ default: m.AdminNews })));
+const AdminSettings = lazy(() => import('../features/admin/components/AdminSettings').then((m) => ({ default: m.AdminSettings })));
+const RolesManagement = lazy(() => import('../features/admin/components/rbac/RolesManagement').then((m) => ({ default: m.RolesManagement })));
+const RolePermissionsManagement = lazy(() => import('../features/admin/components/rbac/RolePermissionsManagement').then((m) => ({ default: m.RolePermissionsManagement })));
+const UserRolesManagement = lazy(() => import('../features/admin/components/rbac/UserRolesManagement').then((m) => ({ default: m.UserRolesManagement })));
+
+const Login = lazy(() => import('../features/auth/components/Login').then((m) => ({ default: m.Login })));
+const Register = lazy(() => import('../features/auth/components/Register').then((m) => ({ default: m.Register })));
+const ForgotPassword = lazy(() => import('../features/auth/components/ForgotPassword').then((m) => ({ default: m.ForgotPassword })));
+
+const NotFound = () => (
+  <div style={{ textAlign: 'center', padding: '5rem 2rem' }}>
+    <h1 style={{ fontSize: '4rem' }}>404</h1>
+    <p>Page not found.</p>
+  </div>
+);
 
 const router = createBrowserRouter([
   {

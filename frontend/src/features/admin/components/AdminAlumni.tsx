@@ -4,6 +4,7 @@ import { apiClient } from '../../../api/axios';
 import toast from 'react-hot-toast';
 import { CheckCircle, XCircle, Search, UserPlus } from 'lucide-react';
 import { DataTable, type Column } from '../../../components/DataTable';
+import { getHttpErrorMessage } from '../../../lib/httpError';
 
 interface Alumnus {
   id: string;
@@ -87,7 +88,7 @@ export const AdminAlumni: React.FC = () => {
       toast.success(`Alumnus ${isApproved ? 'approved' : 'approval revoked'}`);
       queryClient.invalidateQueries({ queryKey: ['admin-alumni'] });
     },
-    onError: (err: any) => toast.error(err?.response?.data?.message ?? 'Action failed'),
+    onError: (err: unknown) => toast.error(getHttpErrorMessage(err, 'Action failed')),
   });
 
   // Inject action column render with closure
