@@ -26,7 +26,7 @@ public class OTPService : IOTPService
         var code = RandomNumberGenerator.GetInt32(100000, 999999).ToString();
 
         // 2. Hash the code for storage
-        var codeHash = _passwordHasher.HashPassword(code);
+        var codeHash = _passwordHasher.Hash(code);
 
         // 3. Deactivate any existing unused OTPs for this user of the SAME type
         var existingOtps = await _context.OTPVerifications
@@ -68,7 +68,7 @@ public class OTPService : IOTPService
             return false;
         }
 
-        bool isValid = _passwordHasher.VerifyPassword(code, otp.CodeHash);
+        bool isValid = _passwordHasher.Verify(code, otp.CodeHash);
 
         if (isValid)
         {

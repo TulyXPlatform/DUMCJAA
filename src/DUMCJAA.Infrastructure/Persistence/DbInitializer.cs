@@ -48,7 +48,7 @@ public static class DbInitializer
             var adminUser = new User
             {
                 Email = "admin@dumcjaa.com",
-                PasswordHash = passwordHasher.HashPassword("Admin@123"),
+                PasswordHash = passwordHasher.Hash("Admin@123"),
                 FirstName = "Super",
                 LastName = "Admin",
                 IsActive = true,
