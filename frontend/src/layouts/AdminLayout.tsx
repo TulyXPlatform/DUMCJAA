@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, Calendar, Newspaper, Settings, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Users, Calendar, Newspaper, Settings, LogOut, Menu, X, Shield } from 'lucide-react';
 import './AdminLayout.css';
 import '../features/admin/components/Admin.css';
 
@@ -53,6 +53,10 @@ export const AdminLayout: React.FC = () => {
           <NavLink to="/admin/settings" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`} onClick={() => setIsSidebarOpen(false)}>
             <Settings size={20} />
             <span>CMS Settings</span>
+          </NavLink>
+          <NavLink to="/admin/rbac/roles" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`} onClick={() => setIsSidebarOpen(false)}>
+            <Shield size={20} />
+            <span>Role Management</span>
           </NavLink>
         </nav>
 

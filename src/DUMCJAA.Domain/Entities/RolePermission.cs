@@ -1,6 +1,8 @@
+using DUMCJAA.Domain.Common;
+
 namespace DUMCJAA.Domain.Entities;
 
-public class RolePermission
+public class RolePermission : BaseEntity
 {
     public Guid RoleId { get; set; }
     public Role Role { get; set; } = null!;

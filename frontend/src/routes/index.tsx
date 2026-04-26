@@ -15,6 +15,8 @@ import { AdminAlumni } from '../features/admin/components/AdminAlumni';
 import { AdminEvents } from '../features/admin/components/AdminEvents';
 import { AdminNews } from '../features/admin/components/AdminNews';
 import { AdminSettings } from '../features/admin/components/AdminSettings';
+import { RolesManagement } from '../features/admin/components/rbac/RolesManagement';
+import { RolePermissionsManagement } from '../features/admin/components/rbac/RolePermissionsManagement';
 import { Login } from '../features/auth/components/Login';
 import { Register } from '../features/auth/components/Register';
 import { ForgotPassword } from '../features/auth/components/ForgotPassword';
@@ -51,7 +53,9 @@ const router = createBrowserRouter([
           { path: 'alumni', element: <AdminAlumni /> },
           { path: 'events', element: <AdminEvents /> },
           { path: 'news', element: <AdminNews /> },
-          { path: 'settings', element: <AdminSettings /> }
+          { path: 'settings', element: <AdminSettings /> },
+          { path: 'rbac/roles', element: <RolesManagement /> },
+          { path: 'rbac/roles/:id/permissions', element: <RolePermissionsManagement /> }
         ]
       }
     ]

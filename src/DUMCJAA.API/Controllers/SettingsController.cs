@@ -5,6 +5,7 @@ using DUMCJAA.Domain.Entities;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using DUMCJAA.Domain.Common;
 using System.Text.Json;
 
 namespace DUMCJAA.API.Controllers;

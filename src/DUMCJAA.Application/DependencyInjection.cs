@@ -5,6 +5,7 @@ using DUMCJAA.Application.Features.Samples;
 using DUMCJAA.Application.Features.Alumni;
 using DUMCJAA.Application.Features.Events;
 using DUMCJAA.Application.Features.Settings;
+using DUMCJAA.Application.Features.RBAC;
 
 namespace DUMCJAA.Application;
 
@@ -24,6 +25,8 @@ public static class DependencyInjection
         services.AddScoped<IAlumnusService, AlumnusService>();
         services.AddScoped<IEventService, EventService>();
         services.AddScoped<ISettingsService, SettingsService>();
+        services.AddScoped<IRoleService, RoleService>();
+        services.AddScoped<IPermissionService, PermissionService>();
 
         return services;
     }
