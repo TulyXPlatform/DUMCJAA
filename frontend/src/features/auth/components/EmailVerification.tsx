@@ -2,10 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { Loader2, ShieldCheck } from 'lucide-react';
-import axios from 'axios';
 import { getHttpErrorMessage } from '../../../lib/httpError';
+import { apiClient } from '../../../api/axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+interface VerifyResponse {
+  data: {
+    token: string;
+    roles: string[];
+  };
+}
 
 export const EmailVerification: React.FC = () => {
   const location = useLocation();
@@ -16,15 +21,12 @@ export const EmailVerification: React.FC = () => {
   const [timer, setTimer] = useState(300); // 5 minutes
 
   useEffect(() => {
-    // Get email from navigation state or redirect to register if missing
+    // Get email from navigation state or query string
     const stateEmail = location.state?.email;
-    if (!stateEmail) {
-      toast.error('Session expired. Please sign up again.');
-      navigate('/register');
-      return;
-    }
-    setEmail(stateEmail);
-  }, [location, navigate]);
+    const queryEmail = new URLSearchParams(location.search).get('email');
+    const resolved = stateEmail || queryEmail || '';
+    setEmail(resolved);
+  }, [location]);
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | undefined;
@@ -36,6 +38,10 @@ export const EmailVerification: React.FC = () => {
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email) {
+      toast.error('Please enter your email.');
+      return;
+    }
     if (code.length !== 6) {
       toast.error('Please enter a 6-digit code.');
       return;
@@ -43,9 +49,21 @@ export const EmailVerification: React.FC = () => {
 
     setLoading(true);
     try {
-      await axios.post(`${API_URL}/auth/verify-email`, { email, code });
-      toast.success('Email verified! You can now sign in.');
-      navigate('/login');
+      const response = await apiClient.post<VerifyResponse>('/auth/verify-email', { email, code });
+      const token = response.data?.data?.token;
+      const roles = response.data?.data?.roles ?? [];
+
+      if (token) {
+        localStorage.setItem('token', token);
+        localStorage.setItem('role', roles[0] ?? 'Editor');
+      }
+
+      toast.success('Email verified successfully.');
+      if (roles.includes('Admin') || roles.includes('SuperAdmin')) {
+        navigate('/admin');
+      } else {
+        navigate('/alumni');
+      }
     } catch (err: unknown) {
       toast.error(getHttpErrorMessage(err, 'Verification failed.'));
     } finally {
@@ -56,7 +74,7 @@ export const EmailVerification: React.FC = () => {
   const handleResend = async () => {
     setLoading(true);
     try {
-      await axios.post(`${API_URL}/auth/request-email-verification-otp`, { email }); 
+      await apiClient.post('/auth/request-email-verification-otp', { email });
       toast.success('New code sent to your email.');
       setTimer(300);
     } catch (err: unknown) {
@@ -75,12 +93,21 @@ export const EmailVerification: React.FC = () => {
           </div>
           <h2 className="text-2xl font-bold text-neutral-900">Verify Your Email</h2>
           <p className="mt-2 text-neutral-500">
-            We've sent a 6-digit code to <br />
-            <span className="font-semibold text-neutral-900">{email}</span>
+            Enter your email and the 6-digit verification code.
           </p>
         </div>
 
         <form onSubmit={handleVerify} className="space-y-6">
+          <div>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full text-center text-base py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none transition-all"
+              placeholder="name@example.com"
+              required
+            />
+          </div>
           <div>
             <input
               type="text"
@@ -109,11 +136,11 @@ export const EmailVerification: React.FC = () => {
                 Wait {Math.floor(timer / 60)}:{(timer % 60).toString().padStart(2, '0')}
               </span>
             ) : (
-              <button
-                onClick={handleResend}
-                disabled={loading}
-                className="text-brand-600 hover:text-brand-700 font-bold underline decoration-brand-200 underline-offset-4"
-              >
+                <button
+                  onClick={handleResend}
+                  disabled={loading}
+                  className="text-brand-600 hover:text-brand-700 font-bold underline decoration-brand-200 underline-offset-4"
+                >
                 Resend Code
               </button>
             )}

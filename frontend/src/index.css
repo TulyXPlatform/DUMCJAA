@@ -1,5 +1,19 @@
 @import "tailwindcss";
 
+:root {
+  --bg-main: #f8fafc;
+  --bg-surface: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  --color-primary: #2563eb;
+  --color-secondary: #0ea5e9;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 10px 25px -15px rgba(15, 23, 42, 0.35);
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+}
+
 @theme {
   /* Design Tokens: Colors */
   --color-brand-50: #eff6ff;
@@ -43,17 +57,95 @@
 }
 
 @layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html, body, #root {
+    min-height: 100%;
+    margin: 0;
+  }
+
   body {
     @apply bg-neutral-50 text-neutral-900 antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    color: var(--text-main);
+    background: var(--bg-main);
   }
 
   :focus-visible {
     @apply outline-2 outline-brand-600 outline-offset-2;
   }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 }
 
 @layer components {
+  .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+
+  .card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 0.75rem;
+    padding: 0.625rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: 1px solid transparent;
+    transition: all var(--transition-fast);
+    cursor: pointer;
+  }
+
+  .btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .btn-primary {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+  }
+
+  .btn-outline {
+    background: #fff;
+    color: var(--text-main);
+    border-color: var(--border-color);
+  }
+
+  .btn-outline:hover:not(:disabled) {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+
   /* Animation for page transitions and skeletons */
   .fade-in {
     animation: fadeIn 200ms cubic-bezier(0.4, 0, 0.2, 1);

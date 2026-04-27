@@ -5,10 +5,8 @@ import { registerSchema, type RegisterFormData } from '../types/schemas';
 import { useNavigate, Link } from 'react-router-dom';
 import { User, Mail, Lock, Loader2, ArrowRight } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import axios from 'axios';
 import { getHttpErrorMessage } from '../../../lib/httpError';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import { apiClient } from '../../../api/axios';
 
 export const Register: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -20,7 +18,7 @@ export const Register: React.FC = () => {
   const onSubmit = async (data: RegisterFormData) => {
     setLoading(true);
     try {
-      await axios.post(`${API_URL}/auth/register`, data);
+      await apiClient.post('/auth/register', data);
       toast.success('Account created! Please verify your email.');
       // Pass the email to the verification page via state
       navigate('/verify-email', { state: { email: data.email } });
