@@ -126,6 +126,32 @@ try
         });
     });
 
+    static bool IsAllowedOrigin(string? origin, HashSet<string> configuredOrigins, bool isDevelopment)
+    {
+        if (string.IsNullOrWhiteSpace(origin))
+            return false;
+
+        if (configuredOrigins.Contains(origin))
+            return true;
+
+        if (!Uri.TryCreate(origin, UriKind.Absolute, out var uri))
+            return false;
+
+        var host = uri.Host.ToLowerInvariant();
+
+        // Allow Vercel preview and production frontend domains over HTTPS.
+        if (uri.Scheme == Uri.UriSchemeHttps &&
+            (host.EndsWith(".vercel.app") || host == "dumcjaa.com" || host == "www.dumcjaa.com"))
+            return true;
+
+        // Keep local developer convenience.
+        if (isDevelopment &&
+            (host == "localhost" || host == "127.0.0.1"))
+            return true;
+
+        return false;
+    }
+
     var app = builder.Build();
 
     // ── Database bootstrap (fail fast if DB is unreachable/misconfigured) ──
