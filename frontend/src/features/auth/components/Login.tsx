@@ -84,6 +84,9 @@ export const Login: React.FC = () => {
 
         <div className="auth-footer">
           <p>Don't have an account? <Link to="/register">Create an account</Link></p>
+          <p style={{ marginTop: '0.5rem' }}>
+            Need to verify your email? <Link to="/verify-email">Verify now</Link>
+          </p>
         </div>
       </div>
     </div>

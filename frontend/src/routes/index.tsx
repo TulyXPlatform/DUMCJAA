@@ -1,6 +1,5 @@
 import { lazy } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { ScrollToTop } from '../hooks/useScrollToTop';
 import { MainLayout } from '../layouts/MainLayout';
 import { AdminLayout } from '../layouts/AdminLayout';
 import { ProtectedRoute } from '../components/ProtectedRoute';
@@ -12,6 +11,9 @@ const EventDetailPage = lazy(() => import('../features/events/components/EventDe
 const BlogPage = lazy(() => import('../features/blog/components/BlogPage').then((m) => ({ default: m.BlogPage })));
 const PostDetailPage = lazy(() => import('../features/blog/components/PostDetailPage').then((m) => ({ default: m.PostDetailPage })));
 const GalleryPage = lazy(() => import('../features/gallery/components/GalleryPage').then((m) => ({ default: m.GalleryPage })));
+const AboutPage = lazy(() => import('../features/site/components/AboutPage').then((m) => ({ default: m.AboutPage })));
+const PublicationsPage = lazy(() => import('../features/site/components/PublicationsPage').then((m) => ({ default: m.PublicationsPage })));
+const ContactPage = lazy(() => import('../features/site/components/ContactPage').then((m) => ({ default: m.ContactPage })));
 
 const AdminDashboard = lazy(() => import('../features/admin/components/AdminDashboard').then((m) => ({ default: m.AdminDashboard })));
 const AdminAlumni = lazy(() => import('../features/admin/components/AdminAlumni').then((m) => ({ default: m.AdminAlumni })));
@@ -25,6 +27,7 @@ const UserRolesManagement = lazy(() => import('../features/admin/components/rbac
 const Login = lazy(() => import('../features/auth/components/Login').then((m) => ({ default: m.Login })));
 const Register = lazy(() => import('../features/auth/components/Register').then((m) => ({ default: m.Register })));
 const ForgotPassword = lazy(() => import('../features/auth/components/ForgotPassword').then((m) => ({ default: m.ForgotPassword })));
+const EmailVerification = lazy(() => import('../features/auth/components/EmailVerification').then((m) => ({ default: m.EmailVerification })));
 
 const NotFound = () => (
   <div style={{ textAlign: 'center', padding: '5rem 2rem' }}>
@@ -43,12 +46,16 @@ const router = createBrowserRouter([
       { path: 'alumni', element: <AlumniDirectory /> },
       { path: 'events', element: <EventsPage /> },
       { path: 'events/:id', element: <EventDetailPage /> },
+      { path: 'about', element: <AboutPage /> },
+      { path: 'publications', element: <PublicationsPage /> },
       { path: 'news', element: <BlogPage /> },
       { path: 'news/:slug', element: <PostDetailPage /> },
       { path: 'gallery', element: <GalleryPage /> },
+      { path: 'contact', element: <ContactPage /> },
       { path: 'login', element: <Login /> },
       { path: 'register', element: <Register /> },
-      { path: 'forgot-password', element: <ForgotPassword /> }
+      { path: 'forgot-password', element: <ForgotPassword /> },
+      { path: 'verify-email', element: <EmailVerification /> }
     ],
   },
   {
@@ -74,9 +81,6 @@ const router = createBrowserRouter([
 
 export const AppRouter = () => {
   return (
-    <>
-      <ScrollToTop />
-      <RouterProvider router={router} />
-    </>
+    <RouterProvider router={router} />
   );
 };

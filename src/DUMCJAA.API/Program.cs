@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.EntityFrameworkCore;
 using DUMCJAA.API.Middleware;
 using DUMCJAA.Application;
 using DUMCJAA.Infrastructure;
@@ -27,6 +28,15 @@ try
     // ── Layer DI registration ──
     builder.Services.AddApplication();
     builder.Services.AddInfrastructure(builder.Configuration);
+
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    if (string.IsNullOrWhiteSpace(connectionString) ||
+        connectionString.Contains("your_username", StringComparison.OrdinalIgnoreCase) ||
+        connectionString.Contains("your_password", StringComparison.OrdinalIgnoreCase))
+    {
+        throw new InvalidOperationException(
+            "ConnectionStrings__DefaultConnection is missing or still contains placeholder credentials.");
+    }
 
     // ── API services ──
     builder.Services.AddControllers()
@@ -110,48 +120,16 @@ try
     {
         options.AddPolicy("AllowFrontend", policy =>
         {
-            var origins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? ["http://localhost:3000"];
-            policy.WithOrigins(origins)
+            policy.AllowAnyOrigin()
                 .AllowAnyMethod()
-                .AllowAnyHeader()
-                .AllowCredentials();
+                .AllowAnyHeader();
         });
     });
 
     var app = builder.Build();
 
-    // ── Seeding (Background to prevent Render Port Timeout) ──
-    _ = Task.Run(async () =>
-    {
-        try
-        {
-            using var scope = app.Services.CreateScope();
-            var services = scope.ServiceProvider;
-            var context = services.GetRequiredService<DUMCJAA.Infrastructure.Persistence.ApplicationDbContext>();
-            var passwordHasher = services.GetRequiredService<DUMCJAA.Domain.Interfaces.IPasswordHasher>();
-            
-            Console.WriteLine("Starting Database Seeding in background...");
-            await DUMCJAA.Infrastructure.Persistence.DbInitializer.SeedAsync(context, passwordHasher);
-            Console.WriteLine("Database Seeding completed successfully.");
-        }
-        catch (Exception ex)
-        {
-            var msg = "\n=======================================================\n" +
-                      "FATAL ERROR: DATABASE CONNECTION FAILED ON STARTUP!\n" +
-                      "=======================================================\n" +
-                      "Please check the following:\n" +
-                      "1. Did you set the ConnectionStrings__DefaultConnection environment variable in Render?\n" +
-                      "2. Is your Azure SQL Firewall configured to allow access from Render's IP addresses?\n" +
-                      "   (You may need to enable 'Allow Azure services and resources to access this server').\n" +
-                      "3. Are your database username and password correct?\n" +
-                      "=======================================================\n";
-                      
-            Console.WriteLine(msg);
-            Console.WriteLine(ex.ToString());
-            Log.Fatal(ex, "DATABASE CONNECTION FAILED ON STARTUP");
-            Log.CloseAndFlush();
-        }
-    });
+    // ── Database bootstrap (fail fast if DB is unreachable/misconfigured) ──
+    await InitializeDatabaseAsync(app.Services);
 
     // ── Middleware pipeline ──
     app.UseMiddleware<GlobalExceptionMiddleware>();
@@ -180,11 +158,47 @@ try
 
     // Lightweight probes for Render health checks
     app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
+    app.MapGet("/health/db", async (DUMCJAA.Infrastructure.Persistence.ApplicationDbContext db, CancellationToken ct) =>
+    {
+        var canConnect = await db.Database.CanConnectAsync(ct);
+        return canConnect
+            ? Results.Ok(new { status = "ok", database = "reachable" })
+            : Results.Problem("Database unreachable", statusCode: 503);
+    });
 
     // Let client-side routes (e.g. /events/123) resolve to React's index.html
     app.MapFallbackToFile("index.html");
 
     app.Run();
+
+    static async Task InitializeDatabaseAsync(IServiceProvider services)
+    {
+        const int maxAttempts = 5;
+        for (var attempt = 1; attempt <= maxAttempts; attempt++)
+        {
+            try
+            {
+                using var scope = services.CreateScope();
+                var context = scope.ServiceProvider.GetRequiredService<DUMCJAA.Infrastructure.Persistence.ApplicationDbContext>();
+                var passwordHasher = scope.ServiceProvider.GetRequiredService<DUMCJAA.Domain.Interfaces.IPasswordHasher>();
+
+                Console.WriteLine($"Database initialization attempt {attempt}/{maxAttempts}...");
+                await context.Database.EnsureCreatedAsync();
+                await DUMCJAA.Infrastructure.Persistence.DbInitializer.SeedAsync(context, passwordHasher);
+                Console.WriteLine("Database initialization completed successfully.");
+                return;
+            }
+            catch (Exception ex) when (attempt < maxAttempts)
+            {
+                Log.Warning(ex, "Database initialization attempt {Attempt} failed. Retrying...", attempt);
+                await Task.Delay(TimeSpan.FromSeconds(5 * attempt));
+            }
+        }
+
+        throw new InvalidOperationException(
+            "Database initialization failed after multiple attempts. " +
+            "Check ConnectionStrings__DefaultConnection and Azure SQL firewall settings.");
+    }
 }
 catch (Exception ex)
 {
