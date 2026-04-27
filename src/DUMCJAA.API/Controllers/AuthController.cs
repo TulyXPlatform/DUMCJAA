@@ -56,8 +56,8 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> VerifyEmail([FromBody] VerifyOTPDto dto, CancellationToken ct)
     {
-        await _authService.VerifyEmailAsync(dto, ct);
-        return Ok(ApiResponse<object>.SuccessResponse(null, "Email verified successfully. You can now login."));
+        var result = await _authService.VerifyEmailAsync(dto, ct);
+        return Ok(ApiResponse<AuthResponseDto>.SuccessResponse(result, "Email verified successfully. You are now logged in."));
     }
 
     [HttpPost("request-email-verification-otp")]

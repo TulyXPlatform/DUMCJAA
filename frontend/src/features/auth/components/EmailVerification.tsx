@@ -5,6 +5,13 @@ import { Loader2, ShieldCheck } from 'lucide-react';
 import { getHttpErrorMessage } from '../../../lib/httpError';
 import { apiClient } from '../../../api/axios';
 
+interface VerifyResponse {
+  data: {
+    token: string;
+    roles: string[];
+  };
+}
+
 export const EmailVerification: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -42,9 +49,21 @@ export const EmailVerification: React.FC = () => {
 
     setLoading(true);
     try {
-      await apiClient.post('/auth/verify-email', { email, code });
-      toast.success('Email verified! You can now sign in.');
-      navigate('/login');
+      const response = await apiClient.post<VerifyResponse>('/auth/verify-email', { email, code });
+      const token = response.data?.data?.token;
+      const roles = response.data?.data?.roles ?? [];
+
+      if (token) {
+        localStorage.setItem('token', token);
+        localStorage.setItem('role', roles[0] ?? 'Editor');
+      }
+
+      toast.success('Email verified successfully.');
+      if (roles.includes('Admin') || roles.includes('SuperAdmin')) {
+        navigate('/admin');
+      } else {
+        navigate('/alumni');
+      }
     } catch (err: unknown) {
       toast.error(getHttpErrorMessage(err, 'Verification failed.'));
     } finally {

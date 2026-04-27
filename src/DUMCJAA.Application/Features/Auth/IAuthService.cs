@@ -10,6 +10,6 @@ public interface IAuthService
     Task RequestPasswordChangeOTPAsync(RequestOTPDto dto, CancellationToken ct = default);
     Task<bool> VerifyOTPAsync(VerifyOTPDto dto, CancellationToken ct = default);
     Task ChangePasswordAsync(ChangePasswordDto dto, CancellationToken ct = default);
-    Task VerifyEmailAsync(VerifyOTPDto dto, CancellationToken ct = default);
+    Task<AuthResponseDto> VerifyEmailAsync(VerifyOTPDto dto, CancellationToken ct = default);
     Task RequestEmailVerificationOTPAsync(RequestOTPDto dto, CancellationToken ct = default);
 }
