@@ -60,6 +60,14 @@ public class AuthController : ControllerBase
         return Ok(ApiResponse<AuthResponseDto>.SuccessResponse(result, "Email verified successfully. You are now logged in."));
     }
 
+    [HttpPost("verify-otp")]
+    [AllowAnonymous]
+    public async Task<IActionResult> VerifyEmailOtp([FromBody] VerifyEmailOtpDto dto, CancellationToken ct)
+    {
+        var result = await _authService.VerifyEmailAsync(new VerifyOTPDto(dto.Email, dto.Otp), ct);
+        return Ok(ApiResponse<AuthResponseDto>.SuccessResponse(result, "OTP verified successfully. You are now logged in."));
+    }
+
     [HttpPost("request-email-verification-otp")]
     [AllowAnonymous]
     public async Task<IActionResult> RequestEmailVerificationOTP([FromBody] RequestOTPDto dto, CancellationToken ct)
@@ -88,9 +96,9 @@ public class AuthController : ControllerBase
         return Ok(ApiResponse<object>.SuccessResponse(null, "If an account exists, a verification code has been sent."));
     }
 
-    [HttpPost("verify-otp")]
+    [HttpPost("verify-password-otp")]
     [AllowAnonymous]
-    public async Task<IActionResult> VerifyOTP([FromBody] VerifyOTPDto dto, CancellationToken ct)
+    public async Task<IActionResult> VerifyPasswordOTP([FromBody] VerifyOTPDto dto, CancellationToken ct)
     {
         var isValid = await _authService.VerifyOTPAsync(dto, ct);
         if (!isValid) return BadRequest(ApiResponse<object>.ErrorResponse("Invalid or expired code.", 400));

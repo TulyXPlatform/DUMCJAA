@@ -41,7 +41,7 @@ export const PasswordResetFlow = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await apiClient.post('/auth/verify-otp', { email, code });
+      await apiClient.post('/auth/verify-password-otp', { email, code });
       toast.success('Code verified successfully.');
       setStep('reset');
     } catch (err: unknown) {

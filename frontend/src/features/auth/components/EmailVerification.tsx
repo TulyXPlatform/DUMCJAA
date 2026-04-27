@@ -49,7 +49,7 @@ export const EmailVerification: React.FC = () => {
 
     setLoading(true);
     try {
-      const response = await apiClient.post<VerifyResponse>('/auth/verify-email', { email, code });
+      const response = await apiClient.post<VerifyResponse>('/auth/verify-otp', { email, otp: code });
       const token = response.data?.data?.token;
       const roles = response.data?.data?.roles ?? [];
 
@@ -60,9 +60,9 @@ export const EmailVerification: React.FC = () => {
 
       toast.success('Email verified successfully.');
       if (roles.includes('Admin') || roles.includes('SuperAdmin')) {
-        navigate('/admin');
+        navigate('/admin/dashboard');
       } else {
-        navigate('/alumni');
+        navigate('/dashboard');
       }
     } catch (err: unknown) {
       toast.error(getHttpErrorMessage(err, 'Verification failed.'));

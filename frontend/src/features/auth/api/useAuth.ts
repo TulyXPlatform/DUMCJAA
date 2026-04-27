@@ -51,9 +51,9 @@ export const useLogin = () => {
       
       // Redirect based on role
       if (data.data.roles.includes('Admin') || data.data.roles.includes('SuperAdmin')) {
-        navigate('/admin');
+        navigate('/admin/dashboard');
       } else {
-        navigate('/alumni');
+        navigate('/dashboard');
       }
     },
     onError: (error: AxiosError<ApiErrorResponse>) => {

@@ -28,6 +28,7 @@ const Login = lazy(() => import('../features/auth/components/Login').then((m) =>
 const Register = lazy(() => import('../features/auth/components/Register').then((m) => ({ default: m.Register })));
 const ForgotPassword = lazy(() => import('../features/auth/components/ForgotPassword').then((m) => ({ default: m.ForgotPassword })));
 const EmailVerification = lazy(() => import('../features/auth/components/EmailVerification').then((m) => ({ default: m.EmailVerification })));
+const UserDashboard = lazy(() => import('../features/auth/components/UserDashboard').then((m) => ({ default: m.UserDashboard })));
 
 const NotFound = () => (
   <div style={{ textAlign: 'center', padding: '5rem 2rem' }}>
@@ -59,6 +60,13 @@ const router = createBrowserRouter([
     ],
   },
   {
+    path: '/dashboard',
+    element: <ProtectedRoute />,
+    children: [
+      { index: true, element: <UserDashboard /> }
+    ]
+  },
+  {
     path: '/admin',
     element: <ProtectedRoute requiredRole="Admin" />,
     children: [
@@ -66,6 +74,7 @@ const router = createBrowserRouter([
         element: <AdminLayout />,
         children: [
           { index: true, element: <AdminDashboard /> },
+          { path: 'dashboard', element: <AdminDashboard /> },
           { path: 'alumni', element: <AdminAlumni /> },
           { path: 'events', element: <AdminEvents /> },
           { path: 'news', element: <AdminNews /> },
