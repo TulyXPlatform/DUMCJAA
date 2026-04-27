@@ -11,6 +11,9 @@ const EventDetailPage = lazy(() => import('../features/events/components/EventDe
 const BlogPage = lazy(() => import('../features/blog/components/BlogPage').then((m) => ({ default: m.BlogPage })));
 const PostDetailPage = lazy(() => import('../features/blog/components/PostDetailPage').then((m) => ({ default: m.PostDetailPage })));
 const GalleryPage = lazy(() => import('../features/gallery/components/GalleryPage').then((m) => ({ default: m.GalleryPage })));
+const AboutPage = lazy(() => import('../features/site/components/AboutPage').then((m) => ({ default: m.AboutPage })));
+const PublicationsPage = lazy(() => import('../features/site/components/PublicationsPage').then((m) => ({ default: m.PublicationsPage })));
+const ContactPage = lazy(() => import('../features/site/components/ContactPage').then((m) => ({ default: m.ContactPage })));
 
 const AdminDashboard = lazy(() => import('../features/admin/components/AdminDashboard').then((m) => ({ default: m.AdminDashboard })));
 const AdminAlumni = lazy(() => import('../features/admin/components/AdminAlumni').then((m) => ({ default: m.AdminAlumni })));
@@ -43,9 +46,12 @@ const router = createBrowserRouter([
       { path: 'alumni', element: <AlumniDirectory /> },
       { path: 'events', element: <EventsPage /> },
       { path: 'events/:id', element: <EventDetailPage /> },
+      { path: 'about', element: <AboutPage /> },
+      { path: 'publications', element: <PublicationsPage /> },
       { path: 'news', element: <BlogPage /> },
       { path: 'news/:slug', element: <PostDetailPage /> },
       { path: 'gallery', element: <GalleryPage /> },
+      { path: 'contact', element: <ContactPage /> },
       { path: 'login', element: <Login /> },
       { path: 'register', element: <Register /> },
       { path: 'forgot-password', element: <ForgotPassword /> },

@@ -23,6 +23,16 @@ interface ApiErrorResponse {
   message?: string;
 }
 
+const extractEmailFromRequest = (rawData: unknown): string => {
+  if (typeof rawData !== 'string') return '';
+  try {
+    const parsed = JSON.parse(rawData) as { email?: string };
+    return parsed.email ?? '';
+  } catch {
+    return '';
+  }
+};
+
 export const useLogin = () => {
   const navigate = useNavigate();
 
@@ -46,7 +56,12 @@ export const useLogin = () => {
       }
     },
     onError: (error: AxiosError<ApiErrorResponse>) => {
-      toast.error(error.response?.data?.message || 'Invalid email or password');
+      const message = error.response?.data?.message || 'Invalid email or password';
+      if (message.toLowerCase().includes('email not verified')) {
+        const email = extractEmailFromRequest(error.config?.data);
+        navigate(`/verify-email?email=${encodeURIComponent(email || '')}`);
+      }
+      toast.error(message);
     }
   });
 };
@@ -67,10 +82,12 @@ export const useRegister = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      localStorage.setItem('token', data.data.token);
-      localStorage.setItem('role', data.data.user.role);
-      toast.success('Registration successful!');
-      navigate('/alumni');
+      if (data.data?.token) {
+        localStorage.setItem('token', data.data.token);
+        localStorage.setItem('role', data.data.user.role);
+      }
+      toast.success('Registration successful! Please verify your email.');
+      navigate(`/verify-email?email=${encodeURIComponent(data.data.user.email)}`);
     },
     onError: (error: AxiosError<ApiErrorResponse>) => {
       toast.error(error.response?.data?.message || 'Registration failed. Please check your inputs.');
