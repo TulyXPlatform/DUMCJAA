@@ -18,9 +18,9 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRole }) 
 
   // Placeholder logic for Role checking.
   // In production, decode JWT payload to verify Roles array contains requiredRole.
-  const userRole = localStorage.getItem('role') || 'Admin'; // Mocking Admin role for now
+  const userRole = localStorage.getItem('role');
 
-  if (requiredRole && userRole !== requiredRole) {
+  if (requiredRole && userRole !== requiredRole && userRole !== 'SuperAdmin') {
     toast.error('You do not have permission to access this area.');
     return <Navigate to="/" replace />;
   }

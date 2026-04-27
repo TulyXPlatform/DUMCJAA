@@ -1,4 +1,5 @@
 using System.Net;
+using System.Data.Common;
 using System.Text.Json;
 using DUMCJAA.Application.Common;
 using DUMCJAA.Application.Common.Exceptions;
@@ -64,6 +65,16 @@ public class GlobalExceptionMiddleware
             ForbiddenException forbidden => (
                 HttpStatusCode.Forbidden,
                 forbidden.Message,
+                (List<string>?)null),
+
+            DbException => (
+                HttpStatusCode.ServiceUnavailable,
+                "The service is temporarily unavailable. Please try again shortly.",
+                (List<string>?)null),
+
+            TimeoutException => (
+                HttpStatusCode.ServiceUnavailable,
+                "The request timed out. Please try again shortly.",
                 (List<string>?)null),
 
             _ => (

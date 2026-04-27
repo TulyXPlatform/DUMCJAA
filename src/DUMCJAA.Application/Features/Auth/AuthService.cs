@@ -10,6 +10,8 @@ namespace DUMCJAA.Application.Features.Auth;
 public class AuthService : IAuthService
 {
     private readonly IUserRepository _userRepository;
+    private readonly IRepository<Role> _roleRepository;
+    private readonly IRepository<UserRole> _userRoleRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPasswordHasher _passwordHasher;
     private readonly ITokenService _tokenService;
@@ -19,6 +21,8 @@ public class AuthService : IAuthService
 
     public AuthService(
         IUserRepository userRepository,
+        IRepository<Role> roleRepository,
+        IRepository<UserRole> userRoleRepository,
         IUnitOfWork unitOfWork,
         IPasswordHasher passwordHasher,
         ITokenService tokenService,
@@ -27,6 +31,8 @@ public class AuthService : IAuthService
         ILogger<AuthService> logger)
     {
         _userRepository = userRepository;
+        _roleRepository = roleRepository;
+        _userRoleRepository = userRoleRepository;
         _unitOfWork = unitOfWork;
         _passwordHasher = passwordHasher;
         _tokenService = tokenService;
@@ -84,6 +90,17 @@ public class AuthService : IAuthService
         };
 
         await _userRepository.AddAsync(user, ct);
+        await _unitOfWork.SaveChangesAsync(ct);
+
+        var roleName = string.IsNullOrWhiteSpace(dto.Role) ? Roles.Editor : dto.Role;
+        var role = (await _roleRepository.GetPagedAsync(1, 1, r => r.Name == roleName, ct: ct)).Items.FirstOrDefault()
+            ?? throw new NotFoundException(nameof(Role), roleName);
+
+        await _userRoleRepository.AddAsync(new UserRole
+        {
+            UserId = user.Id,
+            RoleId = role.Id
+        }, ct);
         await _unitOfWork.SaveChangesAsync(ct);
 
         // Generate and send Email Verification OTP
@@ -153,22 +170,39 @@ public class AuthService : IAuthService
         await _unitOfWork.SaveChangesAsync(ct);
     }
 
-    public async Task VerifyEmailAsync(VerifyOTPDto dto, CancellationToken ct = default)
+    public async Task<AuthResponseDto> VerifyEmailAsync(VerifyOTPDto dto, CancellationToken ct = default)
     {
-        var (items, _) = await _userRepository.GetPagedAsync(1, 1, u => u.Email == dto.Email, ct: ct);
-        var user = items.FirstOrDefault();
+        var user = await _userRepository.GetByEmailWithSecurityAsync(dto.Email, ct)
+            ?? throw new NotFoundException(nameof(User), dto.Email);
 
-        if (user == null) throw new NotFoundException(nameof(User), dto.Email);
-        if (user.IsEmailVerified) return;
+        if (!user.IsEmailVerified)
+        {
+            var isValid = await _otpService.VerifyOTPAsync(user.Id, dto.Code, OTPType.EmailVerification);
+            if (!isValid) throw new UnauthorizedException("Invalid or expired verification code.");
 
-        var isValid = await _otpService.VerifyOTPAsync(user.Id, dto.Code, OTPType.EmailVerification);
-        if (!isValid) throw new UnauthorizedException("Invalid or expired verification code.");
+            user.IsEmailVerified = true;
+        }
 
-        user.IsEmailVerified = true;
+        if (!user.IsActive)
+            throw new ForbiddenException("Account is deactivated.");
+
+        var permissions = await _userRepository.GetUserPermissionsAsync(user.Id, ct);
+        var (token, expiresAt) = _tokenService.GenerateToken(user, permissions);
+        user.LastLoginAt = DateTime.UtcNow;
         await _userRepository.UpdateAsync(user, ct);
         await _unitOfWork.SaveChangesAsync(ct);
         
         _logger.LogInformation("Email verified successfully for {Email}", dto.Email);
+
+        return new AuthResponseDto(
+            user.Id,
+            user.Email,
+            user.FullName,
+            user.UserRoles.Select(ur => ur.Role.Name),
+            permissions,
+            token,
+            expiresAt
+        );
     }
 
     public async Task RequestEmailVerificationOTPAsync(RequestOTPDto dto, CancellationToken ct = default)

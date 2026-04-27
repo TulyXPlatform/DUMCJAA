@@ -25,6 +25,26 @@
   color: var(--color-primary-600, var(--color-primary));
 }
 
+.logo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.logo-mark {
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background: #fff;
+}
+
+.logo-text {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
 .main-nav, .auth-nav {
   display: none; /* Hidden on mobile */
 }
@@ -41,7 +61,7 @@
 @media (min-width: 768px) {
   .main-nav {
     display: flex;
-    gap: 2rem;
+    gap: 1rem;
     align-items: center;
   }
   

@@ -39,6 +39,8 @@ public record RequestOTPDto(string Email);
 
 public record VerifyOTPDto(string Email, string Code);
 
+public record VerifyEmailOtpDto(string Email, string Otp);
+
 public record ChangePasswordDto(
     string Email,
     string Code, // The OTP verified previously
