@@ -45,7 +45,7 @@ public class EventsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = Roles.Admin)]
+    [Authorize(Roles = Roles.Admin + "," + Roles.SuperAdmin + "," + Roles.Editor)]
     public async Task<IActionResult> Create([FromBody] CreateEventDto dto, CancellationToken ct)
     {
         var validationResult = await _createValidator.ValidateAsync(dto, ct);
@@ -59,7 +59,7 @@ public class EventsController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = Roles.Admin)]
+    [Authorize(Roles = Roles.Admin + "," + Roles.SuperAdmin + "," + Roles.Editor)]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateEventDto dto, CancellationToken ct)
     {
         var validationResult = await _updateValidator.ValidateAsync(dto, ct);
@@ -72,7 +72,7 @@ public class EventsController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
-    [Authorize(Roles = Roles.Admin)]
+    [Authorize(Roles = Roles.Admin + "," + Roles.SuperAdmin)]
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
     {
         await _eventService.DeleteAsync(id, ct);
@@ -98,7 +98,7 @@ public class EventsController : ControllerBase
     }
 
     [HttpGet("{id:guid}/registrations")]
-    [Authorize(Roles = Roles.Admin)]
+    [Authorize(Roles = Roles.Admin + "," + Roles.SuperAdmin)]
     public async Task<IActionResult> GetRegistrations(Guid id, CancellationToken ct)
     {
         var result = await _eventService.GetEventRegistrationsAsync(id, ct);

@@ -4,17 +4,24 @@ import { toast } from 'react-hot-toast';
 import { Loader2, ShieldCheck } from 'lucide-react';
 import { getHttpErrorMessage } from '../../../lib/httpError';
 import { apiClient } from '../../../api/axios';
+import { useAuthStore } from '../hooks/useAuth';
 
 interface VerifyResponse {
   data: {
-    token: string;
+    userId: string;
+    email: string;
+    fullName: string;
     roles: string[];
+    permissions: string[];
+    token: string;
+    expiresAt: string;
   };
 }
 
 export const EmailVerification: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const setAuth = useAuthStore((state) => state.setAuth);
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -50,15 +57,25 @@ export const EmailVerification: React.FC = () => {
     setLoading(true);
     try {
       const response = await apiClient.post<VerifyResponse>('/auth/verify-otp', { email, otp: code });
-      const token = response.data?.data?.token;
-      const roles = response.data?.data?.roles ?? [];
+      const authData = response.data?.data;
 
-      if (token) {
-        localStorage.setItem('token', token);
-        localStorage.setItem('role', roles[0] ?? 'Editor');
+      if (authData?.token) {
+        setAuth(
+          {
+            id: authData.userId,
+            email: authData.email,
+            fullName: authData.fullName,
+            roles: authData.roles,
+            permissions: authData.permissions,
+          },
+          authData.token
+        );
+        localStorage.setItem('token', authData.token);
+        localStorage.setItem('role', authData.roles[0] ?? 'Editor');
       }
 
       toast.success('Email verified successfully.');
+      const roles = authData?.roles ?? [];
       if (roles.includes('Admin') || roles.includes('SuperAdmin')) {
         navigate('/admin/dashboard');
       } else {

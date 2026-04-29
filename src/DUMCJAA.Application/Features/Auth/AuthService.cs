@@ -12,6 +12,7 @@ public class AuthService : IAuthService
     private readonly IUserRepository _userRepository;
     private readonly IRepository<Role> _roleRepository;
     private readonly IRepository<UserRole> _userRoleRepository;
+    private readonly IRepository<Alumnus> _alumnusRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPasswordHasher _passwordHasher;
     private readonly ITokenService _tokenService;
@@ -23,6 +24,7 @@ public class AuthService : IAuthService
         IUserRepository userRepository,
         IRepository<Role> roleRepository,
         IRepository<UserRole> userRoleRepository,
+        IRepository<Alumnus> alumnusRepository,
         IUnitOfWork unitOfWork,
         IPasswordHasher passwordHasher,
         ITokenService tokenService,
@@ -33,6 +35,7 @@ public class AuthService : IAuthService
         _userRepository = userRepository;
         _roleRepository = roleRepository;
         _userRoleRepository = userRoleRepository;
+        _alumnusRepository = alumnusRepository;
         _unitOfWork = unitOfWork;
         _passwordHasher = passwordHasher;
         _tokenService = tokenService;
@@ -43,12 +46,12 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponseDto> LoginAsync(LoginDto dto, CancellationToken ct = default)
     {
-        var user = await _userRepository.GetByEmailWithSecurityAsync(dto.Email, ct);
+        var user = await _userRepository.GetByLoginIdentifierAsync(dto.Identifier, ct);
 
         if (user is null || !_passwordHasher.Verify(dto.Password, user.PasswordHash))
         {
-            _logger.LogWarning("Failed login attempt for {Email}", dto.Email);
-            throw new UnauthorizedException("Invalid email or password.");
+            _logger.LogWarning("Failed login attempt for {Identifier}", dto.Identifier);
+            throw new UnauthorizedException("Invalid credentials.");
         }
 
         if (!user.IsActive)
@@ -79,9 +82,18 @@ public class AuthService : IAuthService
         if (await _userRepository.ExistsAsync(u => u.Email == dto.Email, ct))
             throw new ConflictException("Email already exists.");
 
+        if (!string.IsNullOrWhiteSpace(dto.Phone) && await _userRepository.ExistsAsync(u => u.Phone == dto.Phone, ct))
+            throw new ConflictException("Phone number already exists.");
+
+        if (!string.IsNullOrWhiteSpace(dto.Username) && await _userRepository.ExistsAsync(u => u.Username == dto.Username, ct))
+            throw new ConflictException("Username already exists.");
+
+        // Create User
         var user = new User
         {
             Email = dto.Email.ToLowerInvariant(),
+            Phone = dto.Phone,
+            Username = dto.Username,
             PasswordHash = _passwordHasher.Hash(dto.Password),
             FirstName = dto.FirstName,
             LastName = dto.LastName,
@@ -90,10 +102,47 @@ public class AuthService : IAuthService
         };
 
         await _userRepository.AddAsync(user, ct);
+
+        // If StudentId is provided, also create a pending Alumnus profile
+        if (!string.IsNullOrWhiteSpace(dto.StudentId))
+        {
+            if (await _alumnusRepository.ExistsAsync(a => a.Email == dto.Email, ct))
+                 throw new ConflictException("An alumni profile with this email already exists.");
+
+            var alumnus = new Alumnus
+            {
+                FirstName = dto.FirstName,
+                LastName = dto.LastName,
+                Email = dto.Email.ToLowerInvariant(),
+                Phone = dto.Phone,
+                StudentId = dto.StudentId,
+                IsApproved = false
+            };
+            await _alumnusRepository.AddAsync(alumnus, ct);
+
+            // Notify Admins about new registration request
+            var adminEmails = await _userRepository.GetAdminEmailsAsync(ct);
+            if (adminEmails.Any())
+            {
+                await _emailService.SendAsync(new EmailMessage
+                {
+                    To = string.Join(",", adminEmails),
+                    Subject = "New Alumni Registration Request",
+                    HtmlBody = $@"
+                        <h3>New Registration Request</h3>
+                        <p><strong>Name:</strong> {user.FullName}</p>
+                        <p><strong>Email:</strong> {user.Email}</p>
+                        <p><strong>Student ID:</strong> {alumnus.StudentId}</p>
+                        <p>Please log in to the admin panel to review this request.</p>"
+                });
+            }
+        }
+
         await _unitOfWork.SaveChangesAsync(ct);
 
         var roleName = string.IsNullOrWhiteSpace(dto.Role) ? Roles.Editor : dto.Role;
-        var role = (await _roleRepository.GetPagedAsync(1, 1, r => r.Name == roleName, ct: ct)).Items.FirstOrDefault()
+        var (items, _) = await _roleRepository.GetPagedAsync(1, 1, r => r.Name == roleName, ct: ct);
+        var role = items.FirstOrDefault()
             ?? throw new NotFoundException(nameof(Role), roleName);
 
         await _userRoleRepository.AddAsync(new UserRole
@@ -112,7 +161,6 @@ public class AuthService : IAuthService
             HtmlBody = $"Welcome! Your verification code is: <strong>{otp}</strong>. It expires in 5 minutes."
         });
 
-        // We don't return a token yet because they need to verify first
         return new AuthResponseDto(
             user.Id, user.Email, user.FullName, new List<string>(), new List<string>(), string.Empty, DateTime.MinValue);
     }

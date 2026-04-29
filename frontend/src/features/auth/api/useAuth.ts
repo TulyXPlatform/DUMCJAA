@@ -4,6 +4,7 @@ import { apiClient } from '../../../api/axios';
 import type { LoginFormData, RegisterFormData } from '../types/schemas';
 import toast from 'react-hot-toast';
 import type { AxiosError } from 'axios';
+import { useAuthStore } from '../hooks/useAuth';
 
 interface AuthResponse {
   success: boolean;
@@ -35,6 +36,7 @@ const extractEmailFromRequest = (rawData: unknown): string => {
 
 export const useLogin = () => {
   const navigate = useNavigate();
+  const setAuth = useAuthStore((state) => state.setAuth);
 
   return useMutation({
     mutationFn: async (data: LoginFormData) => {
@@ -42,10 +44,21 @@ export const useLogin = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      // Store JWT and Role securely in localStorage
+      // Update global auth state
+      setAuth(
+        {
+          id: data.data.userId,
+          email: data.data.email,
+          fullName: data.data.fullName,
+          roles: data.data.roles,
+          permissions: data.data.permissions,
+        },
+        data.data.token
+      );
+      
+      // Also sync legacy localStorage if needed by other components
       localStorage.setItem('token', data.data.token);
-      const primaryRole = data.data.roles[0] ?? 'Editor';
-      localStorage.setItem('role', primaryRole);
+      localStorage.setItem('role', data.data.roles[0] ?? 'Editor');
       
       toast.success('Logged in successfully!');
       
@@ -69,14 +82,18 @@ export const useLogin = () => {
 
 export const useRegister = () => {
   const navigate = useNavigate();
+  const setAuth = useAuthStore((state) => state.setAuth);
 
   return useMutation({
     mutationFn: async (data: RegisterFormData) => {
-      // Omit confirmPassword before sending to backend
+      // Send all registration fields to backend
       const payload = {
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
+        username: data.username,
+        phone: data.phone,
+        studentId: data.studentId,
         password: data.password,
       };
       const response = await apiClient.post<AuthResponse>('/auth/register', payload);
@@ -84,6 +101,16 @@ export const useRegister = () => {
     },
     onSuccess: (data) => {
       if (data.data?.token) {
+        setAuth(
+          {
+            id: data.data.userId,
+            email: data.data.email,
+            fullName: data.data.fullName,
+            roles: data.data.roles,
+            permissions: data.data.permissions,
+          },
+          data.data.token
+        );
         localStorage.setItem('token', data.data.token);
         localStorage.setItem('role', data.data.roles[0] ?? 'Editor');
       }

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Edit2, Trash2, CheckSquare, Plus, X } from 'lucide-react';
 import { apiClient } from '../../../../api/axios';
@@ -13,6 +14,7 @@ interface Role {
 
 
 export const RolesManagement: React.FC = () => {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRole, setEditingRole] = useState<Role | null>(null);
@@ -45,7 +47,7 @@ export const RolesManagement: React.FC = () => {
           <h1 className="admin-title">Role Management</h1>
           <p className="admin-subtitle">Define and manage system roles and their permissions</p>
         </div>
-        <button className="btn btn--primary" onClick={() => { setEditingRole(null); setIsModalOpen(true); }}>
+        <button className="btn btn-primary" onClick={() => { setEditingRole(null); setIsModalOpen(true); }}>
           <Plus size={18} /> Create Role
         </button>
       </div>
@@ -70,7 +72,7 @@ export const RolesManagement: React.FC = () => {
                   <button 
                     className="action-btn" 
                     title="Manage Permissions"
-                    onClick={() => window.location.href = `/admin/rbac/roles/${role.id}/permissions`}
+                    onClick={() => navigate(`/admin/rbac/roles/${role.id}/permissions`)}
                   >
                     <CheckSquare size={16} />
                   </button>
@@ -145,8 +147,8 @@ const RoleModal: React.FC<{ role: Role | null, onClose: () => void, onSuccess: (
             />
           </div>
           <div className="modal-footer">
-            <button type="button" className="btn btn--outline" onClick={onClose}>Cancel</button>
-            <button type="submit" className="btn btn--primary" disabled={mutation.isPending}>
+            <button type="button" className="btn btn-outline" onClick={onClose} disabled={mutation.isPending}>Cancel</button>
+            <button type="submit" className="btn btn-primary" disabled={mutation.isPending}>
               {mutation.isPending ? 'Saving...' : 'Save Role'}
             </button>
           </div>

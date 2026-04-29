@@ -1,27 +1,42 @@
 import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { useAuthStore } from '../features/auth/hooks/useAuth';
 
 interface ProtectedRouteProps {
-  requiredRole?: string;
+  requiredRole?: string | string[];
+  requiredPermission?: string;
 }
 
-// Simple auth check. In a real app, this would use a robust AuthProvider/Context
-// and decode the JWT to check roles and expiration.
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRole }) => {
-  const token = localStorage.getItem('token');
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRole, requiredPermission }) => {
+  const { user, token } = useAuthStore();
+  const location = useLocation();
   
-  if (!token) {
-    toast.error('You must be logged in to view this page.');
-    return <Navigate to="/login" replace />;
+  if (!token || !user) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Placeholder logic for Role checking.
-  // In production, decode JWT payload to verify Roles array contains requiredRole.
-  const userRole = localStorage.getItem('role');
+  // Admin bypass
+  const isSuperAdmin = user.roles.includes('SuperAdmin');
 
-  if (requiredRole && userRole !== requiredRole && userRole !== 'SuperAdmin') {
-    toast.error('You do not have permission to access this area.');
+  if (isSuperAdmin) {
+    return <Outlet />;
+  }
+
+  // Check roles
+  if (requiredRole) {
+    const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+    const hasRole = roles.some(role => user.roles.includes(role));
+    
+    if (!hasRole) {
+      toast.error('You do not have the required role to access this area.');
+      return <Navigate to="/" replace />;
+    }
+  }
+
+  // Check permissions
+  if (requiredPermission && !user.permissions.includes(requiredPermission)) {
+    toast.error('You do not have the required permission to access this area.');
     return <Navigate to="/" replace />;
   }
 

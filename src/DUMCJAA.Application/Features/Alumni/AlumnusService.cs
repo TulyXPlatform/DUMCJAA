@@ -4,6 +4,7 @@ using DUMCJAA.Application.Common.Exceptions;
 using DUMCJAA.Application.Features.Alumni.DTOs;
 using DUMCJAA.Domain.Entities;
 using DUMCJAA.Domain.Interfaces;
+using DUMCJAA.Domain.Common;
 using Microsoft.Extensions.Logging;
 
 namespace DUMCJAA.Application.Features.Alumni;
@@ -11,63 +12,39 @@ namespace DUMCJAA.Application.Features.Alumni;
 public class AlumnusService : IAlumnusService
 {
     private readonly IRepository<Alumnus> _alumnusRepository;
+    private readonly IUserRepository _userRepository;
+    private readonly IEmailService _emailService;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<AlumnusService> _logger;
 
     public AlumnusService(
         IRepository<Alumnus> alumnusRepository,
+        IUserRepository userRepository,
+        IEmailService emailService,
         IUnitOfWork unitOfWork,
         ILogger<AlumnusService> logger)
     {
         _alumnusRepository = alumnusRepository;
+        _userRepository = userRepository;
+        _emailService = emailService;
         _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
     public async Task<PagedResult<AlumnusDto>> GetAllAsync(AlumnusPaginationParams parameters, CancellationToken ct = default)
     {
-        Expression<Func<Alumnus, bool>> filter = x => true;
-
-        if (!string.IsNullOrWhiteSpace(parameters.Search))
-        {
-            var search = parameters.Search.ToLower();
-            filter = x => x.FirstName.ToLower().Contains(search) || 
-                          x.LastName.ToLower().Contains(search) || 
-                          x.Email.ToLower().Contains(search);
-        }
-
-        // Apply additional filters, using explicit type for the lambda parameter
-        if (!string.IsNullOrWhiteSpace(parameters.Batch))
-        {
-            var previousFilter = filter;
-            var batchFilter = parameters.Batch;
-            filter = x => previousFilter.Compile()(x) && x.Batch == batchFilter;
-        }
-
-        if (!string.IsNullOrWhiteSpace(parameters.Department))
-        {
-            var previousFilter = filter;
-            var deptFilter = parameters.Department;
-            filter = x => previousFilter.Compile()(x) && x.Department == deptFilter;
-        }
-
-        if (parameters.IsApproved.HasValue)
-        {
-            var previousFilter = filter;
-            var approvedFilter = parameters.IsApproved.Value;
-            filter = x => previousFilter.Compile()(x) && x.IsApproved == approvedFilter;
-        }
-        
-        // Let's rewrite the filters to avoid .Compile() in LINQ to Entities which throws exception.
-        // Sorting logic without EF dependency in Application layer
+        // Sorting logic
         Expression<Func<Alumnus, object>>? orderBy = null;
         if (!string.IsNullOrWhiteSpace(parameters.SortBy))
         {
             var sortBy = parameters.SortBy.ToLower();
-            if (sortBy == "name" || sortBy == "firstname") orderBy = x => x.FirstName!;
-            else if (sortBy == "batch") orderBy = x => x.Batch!;
-            else if (sortBy == "department") orderBy = x => x.Department!;
-            else orderBy = x => x.CreatedAt!;
+            orderBy = sortBy switch
+            {
+                "name" or "firstname" => x => x.FirstName!,
+                "batch" => x => x.Batch!,
+                "department" => x => x.Department!,
+                _ => x => x.CreatedAt!
+            };
         }
 
         var (items, totalCount) = await _alumnusRepository.GetPagedAsync(
@@ -120,6 +97,7 @@ public class AlumnusService : IAlumnusService
             FirstName = dto.FirstName,
             LastName = dto.LastName,
             Email = dto.Email,
+            StudentId = dto.StudentId,
             Phone = dto.Phone,
             Batch = dto.Batch,
             Department = dto.Department,
@@ -135,6 +113,24 @@ public class AlumnusService : IAlumnusService
         await _unitOfWork.SaveChangesAsync(ct);
 
         _logger.LogInformation("Created new alumnus {Id}", entity.Id);
+
+        // Notify Admins
+        var adminEmails = await _userRepository.GetAdminEmailsAsync(ct);
+        if (adminEmails.Any())
+        {
+            await _emailService.SendAsync(new EmailMessage
+            {
+                To = string.Join(",", adminEmails),
+                Subject = "New Alumni Registration Request",
+                HtmlBody = $@"
+                    <h3>New Registration Request</h3>
+                    <p><strong>Name:</strong> {entity.FullName}</p>
+                    <p><strong>Email:</strong> {entity.Email}</p>
+                    <p><strong>Student ID:</strong> {entity.StudentId}</p>
+                    <p><strong>Batch:</strong> {entity.Batch}</p>
+                    <p>Please log in to the admin panel to review this request.</p>"
+            });
+        }
 
         return MapToDto(entity);
     }
@@ -169,6 +165,7 @@ public class AlumnusService : IAlumnusService
         var entity = await _alumnusRepository.GetByIdAsync(id, ct)
             ?? throw new NotFoundException(nameof(Alumnus), id);
 
+        var previouslyApproved = entity.IsApproved;
         entity.IsApproved = isApproved;
         entity.UpdatedAt = DateTime.UtcNow;
 
@@ -177,25 +174,54 @@ public class AlumnusService : IAlumnusService
 
         _logger.LogInformation("Updated approval status for alumnus {Id} to {IsApproved}", entity.Id, isApproved);
 
+        // Notify Alumnus if approved
+        if (isApproved && !previouslyApproved)
+        {
+            await _emailService.SendAsync(new EmailMessage
+            {
+                To = entity.Email,
+                Subject = "Alumni Membership Approved",
+                HtmlBody = $@"
+                    <h3>Congratulations {entity.FirstName}!</h3>
+                    <p>Your request to join the alumni association has been approved.</p>
+                    <p>You can now log in and access all features.</p>"
+            });
+        }
+
         return MapToDto(entity);
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken ct = default)
     {
-        var exists = await _alumnusRepository.ExistsAsync(x => x.Id == id, ct);
-        if (!exists)
-            throw new NotFoundException(nameof(Alumnus), id);
+        var entity = await _alumnusRepository.GetByIdAsync(id, ct)
+            ?? throw new NotFoundException(nameof(Alumnus), id);
+
+        var wasPending = !entity.IsApproved;
 
         await _alumnusRepository.DeleteAsync(id, ct);
         await _unitOfWork.SaveChangesAsync(ct);
 
         _logger.LogInformation("Deleted alumnus {Id}", id);
+
+        // Notify Alumnus of rejection if it was a pending request
+        if (wasPending)
+        {
+            await _emailService.SendAsync(new EmailMessage
+            {
+                To = entity.Email,
+                Subject = "Alumni Membership Request Update",
+                HtmlBody = $@"
+                    <p>Dear {entity.FirstName},</p>
+                    <p>Thank you for your interest in joining the alumni association.</p>
+                    <p>Unfortunately, your request could not be approved at this time. If you believe this is an error, please contact support.</p>"
+            });
+        }
     }
 
     private static AlumnusDto MapToDto(Alumnus entity) =>
         new(
             entity.Id, entity.FirstName, entity.LastName, entity.FullName,
-            entity.Email, entity.Phone, entity.Batch, entity.Department,
+            entity.Email, entity.StudentId, entity.Phone, entity.Batch, entity.Department,
             entity.CurrentCompany, entity.CurrentDesignation,
             entity.ProfileImageUrl, entity.LinkedInUrl, entity.Biography,
             entity.IsApproved, entity.CreatedAt, entity.UpdatedAt

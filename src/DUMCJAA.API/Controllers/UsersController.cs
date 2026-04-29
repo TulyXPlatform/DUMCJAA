@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using DUMCJAA.Infrastructure.Persistence;
 using DUMCJAA.Domain.Common;
 using DUMCJAA.Application.Common;
-using Microsoft.EntityFrameworkCore;
+using DUMCJAA.Application.Features.Users;
+using DUMCJAA.Application.Features.Auth.DTOs;
 
 namespace DUMCJAA.API.Controllers;
 
@@ -12,26 +12,17 @@ namespace DUMCJAA.API.Controllers;
 [Authorize(Policy = Permissions.UsersManage)]
 public class UsersController : ControllerBase
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUserService _userService;
 
-    public UsersController(ApplicationDbContext context)
+    public UsersController(IUserService userService)
     {
-        _context = context;
+        _userService = userService;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetUsers()
     {
-        var users = await _context.Users
-            .Select(u => new
-            {
-                u.Id,
-                u.FullName,
-                u.Email,
-                u.IsActive,
-                u.CreatedAt
-            })
-            .ToListAsync();
-        return Ok(ApiResponse<object>.SuccessResponse(users));
+        var users = await _userService.GetAllUsersAsync();
+        return Ok(ApiResponse<List<UserDto>>.SuccessResponse(users));
     }
 }

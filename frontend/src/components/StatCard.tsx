@@ -10,6 +10,7 @@ interface StatCardProps {
   icon: React.ReactNode;
   accent: 'blue' | 'green' | 'violet' | 'orange';
   isLoading?: boolean;
+  onClick?: () => void;
 }
 
 const ACCENT_MAP = {
@@ -20,11 +21,15 @@ const ACCENT_MAP = {
 };
 
 export const StatCard: React.FC<StatCardProps> = ({
-  title, value, change, trend = 'neutral', icon, accent, isLoading
+  title, value, change, trend = 'neutral', icon, accent, isLoading, onClick
 }) => {
   const colors = ACCENT_MAP[accent];
   return (
-    <div className="stat-card-admin">
+    <div 
+      className={`stat-card-admin ${onClick ? 'clickable' : ''}`} 
+      onClick={onClick}
+      style={{ cursor: onClick ? 'pointer' : 'default' }}
+    >
       <div className="stat-card-inner">
         <div className="stat-card-text">
           <p className="stat-card-title">{title}</p>

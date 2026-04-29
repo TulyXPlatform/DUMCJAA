@@ -7,6 +7,7 @@ public class Alumnus : BaseEntity, ISoftDeletable
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
+    public string? StudentId { get; set; }
     public string? Phone { get; set; }
     public string? Batch { get; set; } // Graduation year or batch name
     public string? Department { get; set; }

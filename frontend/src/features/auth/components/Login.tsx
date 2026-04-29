@@ -29,18 +29,18 @@ export const Login: React.FC = () => {
 
         <form onSubmit={handleSubmit(onSubmit)} className="auth-form">
           <div className="form-group">
-            <label className="form-label" htmlFor="email">Email Address</label>
+            <label className="form-label" htmlFor="identifier">Email, Username or Phone</label>
             <div className="input-with-icon">
               <Mail className="input-icon" size={18} />
               <input 
-                id="email" 
-                type="email" 
-                className={`form-input ${errors.email ? 'form-input--error' : ''}`} 
-                placeholder="name@example.com"
-                {...register('email')} 
+                id="identifier" 
+                type="text" 
+                className={`form-input ${errors.identifier ? 'form-input--error' : ''}`} 
+                placeholder="Enter your email, username or phone"
+                {...register('identifier')} 
               />
             </div>
-            {errors.email && <p className="form-error">{errors.email.message}</p>}
+            {errors.identifier && <p className="form-error">{errors.identifier.message}</p>}
           </div>
 
           <div className="form-group">

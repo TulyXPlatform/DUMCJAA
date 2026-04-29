@@ -758,3 +758,55 @@
   color: var(--color-primary);
   background: var(--bg-surface);
 }
+
+/* =============================================
+   SUPERADMIN DASHBOARD ADDITIONS
+   ============================================= */
+.superadmin-navbar {
+  margin-top: -0.5rem;
+  animation: slideDown 0.4s ease-out;
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.superadmin-navbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #0f172a;
+  color: white;
+  padding: 1.25rem 2rem;
+  border-radius: 1.25rem;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.15);
+}
+
+.stat-card-admin.clickable {
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card-admin.clickable:active {
+  transform: scale(0.98);
+}
+
+.stat-card-admin.clickable::after {
+  content: 'View Details →';
+  position: absolute;
+  bottom: 1rem;
+  right: 1.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  opacity: 0;
+  transform: translateX(10px);
+  transition: all 0.2s;
+}
+
+.stat-card-admin.clickable:hover::after {
+  opacity: 1;
+  transform: translateX(0);
+}

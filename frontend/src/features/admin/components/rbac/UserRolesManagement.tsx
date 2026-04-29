@@ -85,7 +85,7 @@ export const UserRolesManagement: React.FC = () => {
                 </td>
                 <td className="admin-table-actions">
                   <button 
-                    className="btn btn--outline btn--sm flex items-center gap-2"
+                    className="btn btn-outline btn-sm flex items-center gap-2"
                     onClick={() => openRolesModal(user)}
                   >
                     <Shield size={14} /> Manage Roles
@@ -184,8 +184,8 @@ const UserRolesModal: React.FC<{ user: User, onClose: () => void }> = ({ user, o
         )}
         
         <div className="modal-footer mt-6">
-          <button className="btn btn--outline" onClick={onClose} disabled={mutation.isPending}>Cancel</button>
-          <button className="btn btn--primary" onClick={handleSave} disabled={mutation.isPending || isLoading}>
+          <button className="btn btn-outline" onClick={onClose} disabled={mutation.isPending}>Cancel</button>
+          <button className="btn btn-primary" onClick={handleSave} disabled={mutation.isPending || isLoading}>
             {mutation.isPending ? 'Saving...' : 'Save Assignments'}
           </button>
         </div>

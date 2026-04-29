@@ -27,6 +27,7 @@ public static class DependencyInjection
         services.AddScoped<ISettingsService, SettingsService>();
         services.AddScoped<IRoleService, RoleService>();
         services.AddScoped<IPermissionService, PermissionService>();
+        services.AddScoped<DUMCJAA.Application.Features.Users.IUserService, DUMCJAA.Application.Features.Users.UserService>();
 
         return services;
     }

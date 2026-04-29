@@ -1,7 +1,7 @@
 namespace DUMCJAA.Application.Features.Auth.DTOs;
 
 public record LoginDto(
-    string Email,
+    string Identifier, // Can be Email, Phone, or Username
     string Password
 );
 
@@ -10,6 +10,9 @@ public record RegisterDto(
     string Password,
     string FirstName,
     string LastName,
+    string? Phone = null,
+    string? Username = null,
+    string? StudentId = null,
     string? Role = null
 );
 

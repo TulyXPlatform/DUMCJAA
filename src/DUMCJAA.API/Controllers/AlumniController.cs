@@ -35,9 +35,9 @@ public class AlumniController : ControllerBase
     [AllowAnonymous] // Public can view approved alumni
     public async Task<IActionResult> GetAll([FromQuery] AlumnusPaginationParams paging, CancellationToken ct)
     {
-        // If the user is not authenticated or not an admin, force IsApproved to true
+        // If the user is not an admin, editor, or super admin, force IsApproved to true
         // so they only see publicly approved profiles.
-        if (!User.Identity?.IsAuthenticated ?? true || !User.IsInRole(Roles.Admin))
+        if (!(User.IsInRole(Roles.Admin) || User.IsInRole(Roles.SuperAdmin) || User.IsInRole(Roles.Editor)))
         {
             paging.IsApproved = true;
         }
@@ -55,8 +55,8 @@ public class AlumniController : ControllerBase
     {
         var result = await _alumnusService.GetByIdAsync(id, ct);
         
-        // Prevent public users from viewing unapproved profiles
-        if (!result.IsApproved && (!User.Identity?.IsAuthenticated ?? true || !User.IsInRole(Roles.Admin)))
+        // Prevent public users or non-privileged roles from viewing unapproved profiles
+        if (!result.IsApproved && !(User.IsInRole(Roles.Admin) || User.IsInRole(Roles.SuperAdmin) || User.IsInRole(Roles.Editor)))
         {
             return Forbid();
         }
@@ -78,14 +78,14 @@ public class AlumniController : ControllerBase
 
         var result = await _alumnusService.CreateAsync(dto, ct);
         return CreatedAtAction(nameof(GetById), new { id = result.Id },
-            ApiResponse<AlumnusDto>.SuccessResponse(result, "Profile submitted successfully. Pending admin approval.", 201));
+            ApiResponse<AlumnusDto>.SuccessResponse(result, "Profile submitted successfully. Pending verification.", 201));
     }
 
     /// <summary>
     /// Updates an existing alumnus profile.
     /// </summary>
     [HttpPut("{id:guid}")]
-    [Authorize] // Requires auth. Typically user can only edit their own, but for simplicity assuming admins can edit any.
+    [Authorize] // Requires auth.
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateAlumnusDto dto, CancellationToken ct)
     {
         var validationResult = await _updateValidator.ValidateAsync(dto, ct);
@@ -101,7 +101,7 @@ public class AlumniController : ControllerBase
     /// Admin only: Approves or rejects an alumni profile.
     /// </summary>
     [HttpPatch("{id:guid}/approve")]
-    [Authorize(Roles = Roles.Admin)]
+    [Authorize(Roles = Roles.Admin + "," + Roles.SuperAdmin)]
     public async Task<IActionResult> UpdateApprovalStatus(Guid id, [FromBody] ApproveAlumnusDto dto, CancellationToken ct)
     {
         var result = await _alumnusService.UpdateApprovalStatusAsync(id, dto.IsApproved, ct);
@@ -113,7 +113,7 @@ public class AlumniController : ControllerBase
     /// Admin only: Deletes an alumni profile.
     /// </summary>
     [HttpDelete("{id:guid}")]
-    [Authorize(Roles = Roles.Admin)]
+    [Authorize(Roles = Roles.Admin + "," + Roles.SuperAdmin)]
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
     {
         await _alumnusService.DeleteAsync(id, ct);

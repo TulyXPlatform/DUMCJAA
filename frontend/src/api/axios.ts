@@ -1,6 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import { ENV } from '../config/env';
 import toast from 'react-hot-toast';
+import { useAuthStore } from '../features/auth/hooks/useAuth';
 
 export const apiClient = axios.create({
   baseURL: ENV.API_URL,
@@ -33,11 +34,13 @@ apiClient.interceptors.response.use(
 
     // Handle 401 Unauthorized globally
     if (status === 401) {
-      toast.error('Session expired. Please log in again.');
-      localStorage.removeItem('token');
-      localStorage.removeItem('role');
+      useAuthStore.getState().logout();
       
-      // Prevent redirect loop if already on login page
+      localStorage.removeItem('token');
+      localStorage.setItem('role', '');
+      
+      toast.error('Session expired. Please log in again.');
+      
       if (window.location.pathname !== '/login') {
         window.location.href = '/login';
       }

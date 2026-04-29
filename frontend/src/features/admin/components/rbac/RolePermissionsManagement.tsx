@@ -87,7 +87,7 @@ export const RolePermissionsManagement: React.FC = () => {
             <p className="admin-subtitle">Assign functional permissions to this role</p>
           </div>
         </div>
-        <button className="btn btn--primary" onClick={handleSave} disabled={mutation.isPending}>
+        <button className="btn btn-primary" onClick={handleSave} disabled={mutation.isPending}>
           <Save size={18} /> {mutation.isPending ? 'Saving...' : 'Save Changes'}
         </button>
       </div>
