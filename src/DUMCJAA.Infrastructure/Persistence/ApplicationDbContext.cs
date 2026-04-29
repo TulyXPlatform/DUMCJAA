@@ -19,6 +19,10 @@ public class ApplicationDbContext : DbContext
     public DbSet<Event> Events => Set<Event>();
     public DbSet<EventRegistration> EventRegistrations => Set<EventRegistration>();
     public DbSet<Setting> Settings => Set<Setting>();
+    public DbSet<Publication> Publications => Set<Publication>();
+    public DbSet<JobPost> JobPosts => Set<JobPost>();
+    public DbSet<BlogPost> BlogPosts => Set<BlogPost>();
+    public DbSet<ContactInquiry> ContactInquiries => Set<ContactInquiry>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

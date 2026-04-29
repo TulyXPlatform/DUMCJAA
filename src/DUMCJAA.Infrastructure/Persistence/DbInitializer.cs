@@ -59,10 +59,9 @@ public static class DbInitializer
 
         // Admin gets most but maybe not users.manage? No, user requested Admin can manage.
         // For now, let's give Admin everything except maybe sensitive ones if defined later.
-        // Sync with request: SuperAdmin gets all. Admin and Editor are defaults.
         foreach (var p in allPermissionsFromDb)
         {
-            if (p.Name != Permissions.UsersManage) // Example: Admin doesn't manage users by default in some systems, but SuperAdmin does.
+            if (p.Name != Permissions.UsersManage) 
             {
                 if (!await context.RolePermissions.AnyAsync(rp => rp.RoleId == adminRole.Id && rp.PermissionId == p.Id))
                 {
@@ -71,12 +70,18 @@ public static class DbInitializer
             }
         }
 
-        // Editor gets read/create/update but not delete
-        var editorPermissions = new[] { Permissions.AlumniRead, Permissions.AlumniCreate, Permissions.AlumniUpdate, Permissions.EventsRegister };
+        // Editor gets read/create/update but not delete and not system management
+        var editorPermissions = new[] { 
+            Permissions.AlumniRead, Permissions.AlumniCreate, Permissions.AlumniUpdate, 
+            Permissions.EventsRegister,
+            Permissions.PublicationsRead, Permissions.PublicationsManage,
+            Permissions.CareerRead,
+            Permissions.BlogRead, Permissions.BlogManage
+        };
         foreach (var pName in editorPermissions)
         {
-            var p = allPermissionsFromDb.First(x => x.Name == pName);
-            if (!await context.RolePermissions.AnyAsync(rp => rp.RoleId == editorRole.Id && rp.PermissionId == p.Id))
+            var p = allPermissionsFromDb.FirstOrDefault(x => x.Name == pName);
+            if (p != null && !await context.RolePermissions.AnyAsync(rp => rp.RoleId == editorRole.Id && rp.PermissionId == p.Id))
             {
                 context.RolePermissions.Add(new RolePermission { RoleId = editorRole.Id, PermissionId = p.Id });
             }

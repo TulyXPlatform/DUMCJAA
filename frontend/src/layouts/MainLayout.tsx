@@ -32,11 +32,13 @@ export const MainLayout = () => {
 
           {/* Desktop Navigation */}
           <nav className="main-nav">
+            <NavLink to="/publications" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>Publications</NavLink>
+            <NavLink to="/career" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>Career</NavLink>
+            <NavLink to="/blog" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>Blog</NavLink>
             <NavLink to="/events" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>Events</NavLink>
             <NavLink to="/alumni" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>Alumni</NavLink>
-            <NavLink to="/news" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>News</NavLink>
-            <NavLink to="/gallery" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>Gallery</NavLink>
             <NavLink to="/about" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>About</NavLink>
+            <NavLink to="/contact" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>Contact</NavLink>
           </nav>
           
           <div className="auth-nav">
@@ -63,11 +65,13 @@ export const MainLayout = () => {
         {isMobileMenuOpen && (
           <div className="mobile-nav">
             <div className="mobile-nav-links">
+              <Link to="/publications" className="mobile-nav-link" onClick={toggleMobileMenu}>Publications</Link>
+              <Link to="/career" className="mobile-nav-link" onClick={toggleMobileMenu}>Career</Link>
+              <Link to="/blog" className="mobile-nav-link" onClick={toggleMobileMenu}>Blog</Link>
               <Link to="/events" className="mobile-nav-link" onClick={toggleMobileMenu}>Events</Link>
               <Link to="/alumni" className="mobile-nav-link" onClick={toggleMobileMenu}>Alumni Directory</Link>
-              <Link to="/news" className="mobile-nav-link" onClick={toggleMobileMenu}>News</Link>
-              <Link to="/gallery" className="mobile-nav-link" onClick={toggleMobileMenu}>Gallery</Link>
               <Link to="/about" className="mobile-nav-link" onClick={toggleMobileMenu}>About</Link>
+              <Link to="/contact" className="mobile-nav-link" onClick={toggleMobileMenu}>Contact</Link>
               <div className="mobile-auth-divider"></div>
               {token ? (
                 <>
