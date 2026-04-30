@@ -28,6 +28,7 @@ const AdminSettings = lazy(() => import('../features/admin/components/AdminSetti
 const RolesManagement = lazy(() => import('../features/admin/components/rbac/RolesManagement').then((m) => ({ default: m.RolesManagement })));
 const RolePermissionsManagement = lazy(() => import('../features/admin/components/rbac/RolePermissionsManagement').then((m) => ({ default: m.RolePermissionsManagement })));
 const UserRolesManagement = lazy(() => import('../features/admin/components/rbac/UserRolesManagement').then((m) => ({ default: m.UserRolesManagement })));
+const PermissionsManagement = lazy(() => import('../features/admin/components/rbac/PermissionsManagement').then((m) => ({ default: m.PermissionsManagement })));
 
 const Login = lazy(() => import('../features/auth/components/Login').then((m) => ({ default: m.Login })));
 const Register = lazy(() => import('../features/auth/components/Register').then((m) => ({ default: m.Register })));
@@ -92,7 +93,8 @@ const router = createBrowserRouter([
           { path: 'settings', element: <AdminSettings /> },
           { path: 'rbac/roles', element: <RolesManagement /> },
           { path: 'rbac/roles/:id/permissions', element: <RolePermissionsManagement /> },
-          { path: 'rbac/users', element: <UserRolesManagement /> }
+          { path: 'rbac/users', element: <UserRolesManagement /> },
+          { path: 'rbac/permissions', element: <PermissionsManagement /> }
         ]
       }
     ]

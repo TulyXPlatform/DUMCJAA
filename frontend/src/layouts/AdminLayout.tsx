@@ -22,10 +22,8 @@ export const AdminLayout: React.FC = () => {
   };
 
   const isSuperAdmin = user?.roles.includes('SuperAdmin');
-  const isAdmin = user?.roles.includes('Admin') || isSuperAdmin;
 
   const hasPermission = (perm?: string) => !perm || user?.permissions.includes(perm) || isSuperAdmin;
-  const hasRole = (role?: string) => !role || user?.roles.includes(role) || isSuperAdmin;
 
   return (
     <div className="admin-layout">
@@ -45,7 +43,7 @@ export const AdminLayout: React.FC = () => {
         
         <nav className="admin-nav">
           {ADMIN_NAV_ITEMS.map((item) => (
-            (hasPermission(item.permission) && hasRole(item.role)) && (
+            hasPermission(item.permission) && (
               <NavLink 
                 key={item.path} 
                 to={item.path} 
