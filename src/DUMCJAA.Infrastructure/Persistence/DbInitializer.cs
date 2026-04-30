@@ -9,8 +9,6 @@ public static class DbInitializer
 {
     public static async Task SeedAsync(ApplicationDbContext context, IPasswordHasher passwordHasher)
     {
-        await context.Database.EnsureCreatedAsync();
-
         // 1. Seed Permissions
         var allPermissionNames = Permissions.All;
         var existingPermissions = await context.Permissions.ToListAsync();
