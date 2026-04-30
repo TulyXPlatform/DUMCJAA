@@ -1,0 +1,12 @@
+.site-page { padding: 1.25rem 0 2.5rem; }
+.site-hero { background: linear-gradient(140deg,#0f172a,#1e293b); color: #fff; border-radius: 1rem; padding: 2rem; margin-bottom: 1.5rem; }
+.site-eyebrow { text-transform: uppercase; letter-spacing: .08em; font-weight: 700; font-size: .75rem; color: #7dd3fc; }
+.site-title { margin: .35rem 0 .65rem; font-size: clamp(1.6rem,3vw,2.4rem); }
+.site-desc { color: #cbd5e1; max-width: 760px; line-height: 1.75; }
+.site-grid { display:grid; gap:1rem; grid-template-columns: repeat(12,minmax(0,1fr)); }
+.site-card { grid-column: span 12; border: 1px solid #e2e8f0; border-radius:.9rem; padding:1.25rem; background:#fff; }
+.site-card h3 { margin:0 0 .6rem; font-size:1.15rem; }
+.site-card p, .site-card li { color:#475569; line-height:1.7; }
+.site-card ul { margin:.5rem 0 0 1.1rem; }
+.site-actions { display:flex; flex-wrap:wrap; gap:.75rem; margin-top:1.5rem; }
+@media (min-width: 900px){ .site-card.span-6{grid-column: span 6;} .site-card.span-4{grid-column: span 4;} }
