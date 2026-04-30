@@ -33,3 +33,13 @@ public record RolePermissionsResponseDto(
     Guid RoleId,
     List<PermissionDto> Permissions
 );
+
+public record CreatePermissionDto(
+    [Required] [StringLength(100)] string Name,
+    [StringLength(300)] string Description
+);
+
+public record UpdatePermissionDto(
+    [Required] [StringLength(100)] string Name,
+    [StringLength(300)] string Description
+);

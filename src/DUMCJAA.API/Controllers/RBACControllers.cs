@@ -121,4 +121,32 @@ public class PermissionsController : ControllerBase
         var result = await _permissionService.GetAllPermissionsAsync();
         return Ok(ApiResponse<List<PermissionDto>>.SuccessResponse(result));
     }
+
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetById(Guid id)
+    {
+        var result = await _permissionService.GetPermissionByIdAsync(id);
+        return Ok(ApiResponse<PermissionDto>.SuccessResponse(result));
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] CreatePermissionDto dto)
+    {
+        var result = await _permissionService.CreatePermissionAsync(dto);
+        return CreatedAtAction(nameof(GetById), new { id = result.Id }, ApiResponse<PermissionDto>.SuccessResponse(result, "Permission created successfully.", 201));
+    }
+
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdatePermissionDto dto)
+    {
+        var result = await _permissionService.UpdatePermissionAsync(id, dto);
+        return Ok(ApiResponse<PermissionDto>.SuccessResponse(result, "Permission updated successfully."));
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        await _permissionService.DeletePermissionAsync(id);
+        return Ok(ApiResponse<object>.SuccessResponse(null!, "Permission deleted successfully."));
+    }
 }

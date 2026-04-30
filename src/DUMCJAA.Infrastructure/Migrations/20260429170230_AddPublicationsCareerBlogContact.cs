@@ -11,6 +11,10 @@ namespace DUMCJAA.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql("IF OBJECT_ID('dbo.BlogPosts', 'U') IS NOT NULL DROP TABLE [dbo].[BlogPosts];");
+            migrationBuilder.Sql("IF OBJECT_ID('dbo.ContactInquiries', 'U') IS NOT NULL DROP TABLE [dbo].[ContactInquiries];");
+            migrationBuilder.Sql("IF OBJECT_ID('dbo.JobPosts', 'U') IS NOT NULL DROP TABLE [dbo].[JobPosts];");
+            migrationBuilder.Sql("IF OBJECT_ID('dbo.Publications', 'U') IS NOT NULL DROP TABLE [dbo].[Publications];");
             migrationBuilder.CreateTable(
                 name: "BlogPosts",
                 columns: table => new
