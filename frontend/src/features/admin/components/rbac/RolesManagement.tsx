@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Edit2, Trash2, CheckSquare, Plus, X } from 'lucide-react';
 import { apiClient } from '../../../../api/axios';
+import { unwrap } from '../../../../api/http';
 import toast from 'react-hot-toast';
 
 interface Role {
@@ -23,7 +24,7 @@ export const RolesManagement: React.FC = () => {
     queryKey: ['roles'],
     queryFn: async () => {
       const res = await apiClient.get('/roles');
-      return res.data.data as Role[];
+      return unwrap<Role[]>(res);
     }
   });
 
