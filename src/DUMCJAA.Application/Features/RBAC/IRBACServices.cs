@@ -21,4 +21,8 @@ public interface IRoleService
 public interface IPermissionService
 {
     Task<List<PermissionDto>> GetAllPermissionsAsync();
+    Task<PermissionDto> GetPermissionByIdAsync(Guid id);
+    Task<PermissionDto> CreatePermissionAsync(CreatePermissionDto dto);
+    Task<PermissionDto> UpdatePermissionAsync(Guid id, UpdatePermissionDto dto);
+    Task DeletePermissionAsync(Guid id);
 }

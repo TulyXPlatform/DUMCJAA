@@ -71,8 +71,33 @@ try
     // ── Middleware ──
     var app = builder.Build();
 
-    // Database bootstrap
-    await InitializeDatabaseAsync(app.Services);
+    // Bind Render/containers port explicitly when provided
+    var portValue = Environment.GetEnvironmentVariable("PORT");
+    if (int.TryParse(portValue, out var port))
+    {
+        app.Urls.Add($"http://0.0.0.0:{port}");
+        Log.Information("Listening on port {Port}", port);
+    }
+
+    // Database bootstrap: block in development for fast feedback, async in production for fast port binding
+    if (app.Environment.IsDevelopment())
+    {
+        await InitializeDatabaseAsync(app.Services);
+    }
+    else
+    {
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await InitializeDatabaseAsync(app.Services);
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Database initialization failed in background task.");
+            }
+        });
+    }
 
     app.UseMiddleware<GlobalExceptionMiddleware>();
     app.UseSerilogRequestLogging();
