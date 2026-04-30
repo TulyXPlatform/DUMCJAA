@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Edit2, Plus, Trash2, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { apiClient } from '../../../../api/axios';
+import { unwrap } from '../../../../api/http';
 
 type Permission = { id: string; name: string; description: string };
 
@@ -13,7 +14,7 @@ export const PermissionsManagement: React.FC = () => {
 
   const { data: permissions, isLoading } = useQuery({
     queryKey: ['permissions'],
-    queryFn: async () => (await apiClient.get('/permissions')).data.data as Permission[]
+    queryFn: async () => unwrap<Permission[]>(await apiClient.get('/permissions'))
   });
 
   const deleteMutation = useMutation({

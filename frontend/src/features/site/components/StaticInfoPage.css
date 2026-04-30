@@ -1,0 +1,8 @@
+.static-page-shell { padding: 1rem 0 2rem; }
+.static-hero { padding: 2rem; margin-bottom: 1.5rem; border: 1px solid #e2e8f0; background: linear-gradient(160deg,#ffffff,#f8fbff); }
+.static-title { margin-bottom: .75rem; }
+.static-sections { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+.static-section-card { padding: 1.5rem; border: 1px solid #e2e8f0; }
+.static-section-title { margin: 0 0 .75rem; font-size: 1.25rem; color: var(--text-main); }
+.static-section-body { margin: 0; line-height: 1.75; color: var(--text-muted); }
+.static-actions { margin-top: 2rem; display: flex; gap: .75rem; flex-wrap: wrap; }

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import './StaticInfoPage.css';
 
 interface ContentSection {
   title: string;
@@ -20,24 +21,24 @@ export const StaticInfoPage: React.FC<StaticInfoPageProps> = ({
   sections,
 }) => {
   return (
-    <section className="home-section bg-main">
+    <section className="home-section bg-main static-page-shell">
       <div className="container">
-        <div className="card" style={{ padding: '2rem', marginBottom: '1.5rem' }}>
+        <div className="card static-hero">
           <span className="section-eyebrow">{eyebrow}</span>
-          <h1 className="section-title" style={{ marginBottom: '0.75rem' }}>{title}</h1>
-          <p className="section-description" style={{ marginBottom: 0 }}>{description}</p>
+          <h1 className="section-title static-title">{title}</h1>
+          <p className="section-description">{description}</p>
         </div>
 
-        <div className="three-col-grid" style={{ gridTemplateColumns: '1fr' }}>
+        <div className="static-sections">
           {sections.map((section) => (
-            <article key={section.title} className="card" style={{ padding: '1.5rem' }}>
-              <h2 style={{ margin: '0 0 0.75rem', fontSize: '1.25rem', color: 'var(--text-main)' }}>{section.title}</h2>
-              <p style={{ margin: 0, lineHeight: 1.7, color: 'var(--text-muted)' }}>{section.body}</p>
+            <article key={section.title} className="card static-section-card">
+              <h2 className="static-section-title">{section.title}</h2>
+              <p className="static-section-body">{section.body}</p>
             </article>
           ))}
         </div>
 
-        <div style={{ marginTop: '2rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+        <div className="static-actions">
           <Link to="/events" className="btn btn-primary">View Events</Link>
           <Link to="/alumni" className="btn btn-outline">Browse Alumni</Link>
         </div>
